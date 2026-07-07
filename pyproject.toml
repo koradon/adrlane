@@ -1,6 +1,6 @@
 [project]
 name = "adrlane"
-version = "0.1.1"
+version = "0.1.2"
 description = "Documentation-as-code bootstrap for AI agents"
 readme = "README.md"
 requires-python = ">=3.10"
