@@ -3,8 +3,7 @@ from __future__ import annotations
 import re
 from collections.abc import Sequence
 
-from typer.testing import CliRunner
-from typer.testing import Result
+from typer.testing import CliRunner, Result
 
 from adrlane.cli.main import app
 

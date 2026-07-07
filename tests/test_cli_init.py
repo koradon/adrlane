@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from adrlane import __version__
 from helpers import invoke_cli, plain_output
+
+from adrlane import __version__
 
 
 def test_init_help(runner) -> None:
