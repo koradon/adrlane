@@ -11,286 +11,226 @@
 
 Teams using AI coding agents often forget to keep project documentation current while coding.
 Architecture decisions, runbooks, and implementation notes drift from real code changes.
-This causes onboarding friction, poor handoffs, and avoidable rework.
+Agents lack a shared map of where documentation lives, how it is structured, and how to update it consistently.
 
-We need a local-first docs-as-code tool that:
+We need a local-first docs-as-code bootstrap tool that:
 
-- keeps documentation inside `/docs`,
-- supports autonomous AI-assisted updates,
-- works with hybrid model providers (local + remote),
-- stays agent-agnostic (Cursor, Claude, ChatGPT, local LLMs),
-- and integrates with normal Git workflows.
+- scaffolds a predictable `/docs` structure in every repository,
+- ships agent-facing instructions and skills so different agents work the same way,
+- stays agent-agnostic (Cursor, Claude Code, OpenCode, and other LLM agents),
+- leaves update decisions to the agent and developer — no automation pipeline, no enforcement.
 
 ## 2. Product Goals
 
 ### 2.1 Primary Goals
 
-- Provide a `pip install adrlane` CLI for local docs automation.
-- Automatically create/update docs artifacts based on code changes.
-- Keep edits constrained to docs scope and visible in `git diff`.
-- Encode universal LLM-facing rules so different agents behave consistently.
-- Support both manual execution and Git hook execution.
+- Provide a globally installable CLI (`pipx install adrlane` or `pip install adrlane`).
+- Bootstrap repository documentation layout and templates via `adrlane init`.
+- Install agent-specific skills/rules so agents know where to read and write documentation.
+- Encode a universal, plain-Markdown documentation contract under `docs/llm/`.
+- Keep all documentation inside the repository and reviewable via normal Git workflows.
 
-### 2.2 Non-Goals (v1)
+### 2.2 Non-Goals (v1 and beyond)
 
+- Automated documentation sync or rewrite pipelines.
+- Policy engines, intent detection, or required-docs rules.
+- Git hooks for docs gating or post-commit automation.
+- LLM provider orchestration, routing, or auto-write execution.
+- Blocking or warning gates on commits/CI.
 - Full docs website generator.
-- Real-time daemon watching all file system events.
 - External SaaS dependency for core functionality.
 - Complex multi-repo orchestration.
 
 ## 3. Target User (v1)
 
 - Solo developer working locally in one repository.
-- Wants high autonomy with safe review via Git.
 - Uses one or more AI agents during coding.
+- Wants agents to understand project documentation structure without manual onboarding each time.
 
 ## 4. High-Level Architecture
 
-`adrlane` has five core subsystems:
+`adrlane` has three core subsystems:
 
 1. **CLI Layer**  
-   Entry point commands (`init`, `sync`, `doctor`, `hook`).
-2. **Policy Engine**  
-   Rule evaluation for "what docs action is required".
-3. **Change Analyzer**  
-   Inspects Git state and maps code changes to doc intents.
-4. **AI Orchestrator**  
-   Routes tasks to selected providers/models and applies edits.
-5. **Quality Gate**  
-   Validates docs changes (scope, templates, lint, required artifacts).
+   Entry point commands (`init`, optional `doctor`).
+
+2. **Documentation Bootstrap**  
+   Creates folder structure, templates, and canonical agent instructions in `docs/`.
+
+3. **Agent Adapters**  
+   Installs skills/rules for supported agents (e.g. Cursor, Claude Code) that point agents at the documentation contract.
 
 ## 5. Core UX and CLI
 
 ### 5.1 Commands
 
 - `adrlane init`  
-  Bootstrap `/docs` structure, templates, and `adrlane.yml`.
+  Bootstrap `/docs` structure, templates, `docs/llm/*` contract files, and agent skills for selected agents.
 
-- `adrlane sync`  
-  Analyze current repo state and apply docs updates automatically.
+- `adrlane init --agent <name>` (repeatable)  
+  Limit or extend which agent adapters are installed (e.g. `cursor`, `claude-code`).
 
-- `adrlane sync --from <git-ref>`  
-  Limit analysis to changes since a ref.
+- `adrlane init --dry-run`  
+  Show files and folders that would be created without writing them.
 
-- `adrlane sync --dry-run`  
-  Show intended actions without writing files.
-
-- `adrlane doctor`  
-  Validate config, providers, template integrity, and hook setup.
-
-- `adrlane hook install --pre-commit`  
-  Install pre-commit integration.
-
-- `adrlane hook install --post-commit`  
-  Install post-commit integration.
-
-- `adrlane hook uninstall`
+- `adrlane doctor` (optional, informational)  
+  Check whether the repository has the expected documentation structure and agent adapters present.
 
 ### 5.2 Exit Behavior
 
-- `0`: success, no blocking issues
-- `1`: blocking validation or runtime failure
-- `2`: partial success with warnings (non-blocking policy failures)
+- `0`: success
+- `1`: runtime or validation failure
 
-## 6. Repository Contract (Docs-as-Code Standard)
+## 6. Installation and Distribution
+
+### 6.1 Global Install (recommended)
+
+Install once on the developer machine:
+
+```bash
+pipx install adrlane
+```
+
+Alternative:
+
+```bash
+pip install adrlane
+```
+
+### 6.2 Per-Repository Bootstrap
+
+Inside a target repository:
+
+```bash
+adrlane init
+```
+
+`init` is idempotent: re-running should not destroy existing documentation content.
+
+### 6.3 Packaging
+
+- Python package built with modern PEP 621 metadata.
+- Console entry point: `adrlane`.
+- Optional extra: `adrlane[dev]` for test/lint tooling.
+- Agent skill templates ship inside the package and are copied into the repository on `init`.
+
+## 7. Repository Contract (Docs-as-Code Standard)
 
 `adrlane init` creates:
 
-- `docs/README.md`
-- `docs/adr/`
-- `docs/specs/`
-- `docs/runbooks/`
-- `docs/changelog/`
-- `docs/llm/AGENT_PROTOCOL.md`
-- `docs/llm/DECISION_RULES.md`
-- `docs/llm/TEMPLATES.md`
-- `docs/llm/QUALITY_GATES.md`
-- `adrlane.yml`
+- `docs/README.md` — map of the documentation tree
+- `docs/adr/` — architecture decision records
+- `docs/specs/` — feature and API specifications
+- `docs/runbooks/` — operational procedures
+- `docs/changelog/` — release and change notes
+- `docs/llm/AGENT_PROTOCOL.md` — how agents should read and update docs
+- `docs/llm/DECISION_RULES.md` — when and why to create or update each doc type
+- `docs/llm/TEMPLATES.md` — required sections and naming conventions
+- `docs/llm/DOC_GUIDELINES.md` — style, metadata, and consistency guidelines
 
-### 6.1 Universal LLM Contract
+Plus agent adapter files for supported agents, for example:
 
-`docs/llm/AGENT_PROTOCOL.md` defines:
+- Cursor skills under `.cursor/skills/` (or project rules, depending on final format)
+- Claude Code instructions under the path required by that tool
 
-- allowed write scope (`/docs/**` only in doc update mode),
-- mandatory artifact conventions (ADR naming, spec naming),
+Exact adapter paths are defined per agent and may evolve independently of the core `docs/llm/` contract.
+
+### 7.1 Universal LLM Contract
+
+`docs/llm/AGENT_PROTOCOL.md` is the canonical, agent-agnostic source of truth. It defines:
+
+- where each documentation type lives,
+- how to search for existing context before writing,
+- where to append or create new documentation,
+- artifact naming conventions (ADR, spec, runbook),
 - required metadata headers,
 - update semantics (create vs append vs patch),
 - conflict policy (never delete unrelated docs),
-- language/style consistency rules.
+- language and style consistency rules.
 
-This file is intentionally model-agnostic and plain Markdown so any agent can follow it.
+Agent-specific skills/rules are adapters: they teach the agent how to find and follow `docs/llm/*`.
 
-## 7. Policy Engine
+### 7.2 Agent Decision Model
 
-### 7.1 Intent Types
+The agent decides whether documentation needs updating during normal development work.
+`adrlane` does not detect gaps, schedule updates, or write documentation on behalf of the user.
 
-`adrlane` classifies changes into intents:
+## 8. Agent Skills and Adapters
 
-- `adr_required`
-- `spec_update_required`
-- `runbook_required`
-- `changelog_update_required`
-- `doc_refactor_recommended`
+### 8.1 Purpose
 
-### 7.2 Example Rules
+Skills give each supported agent a project-local, tool-native entry point into the documentation system.
+An agent skill should answer:
 
-- If files in `src/architecture/**` change and no ADR changed, emit `adr_required`.
-- If public API signatures changed and no spec changed, emit `spec_update_required`.
-- If deployment scripts changed and no runbook changed, emit `runbook_required`.
-- If release-impacting changes exist, emit `changelog_update_required`.
+- where documentation lives in this repository,
+- which file to read first,
+- how to update ADRs, specs, runbooks, and changelog entries,
+- which templates and guidelines to follow.
 
-Rules are configurable in `adrlane.yml`.
+### 8.2 Supported Agents (v1 target)
 
-## 8. AI Orchestration
+Initial targets (subject to prioritization):
 
-### 8.1 Provider Model
+- Cursor
+- Claude Code
 
-Hybrid support:
+Additional adapters (e.g. OpenCode) can follow the same pattern without changing the core contract.
 
-- local providers (LM Studio, Ollama, OpenAI-compatible local gateways),
-- remote providers (OpenAI-compatible APIs).
+### 8.3 Skill Content Strategy
 
-### 8.2 Routing
+- Canonical rules live in `docs/llm/*`.
+- Agent skills are concise adapters that reference those files.
+- Skills are copied/generated during `init`, not fetched from a remote service.
 
-Task-to-model mapping example:
+## 9. Developer Workflow
 
-- `adr_required` -> reasoning-heavy model
-- `changelog_update_required` -> cheaper fast model
-- fallback chain per task class
+1. Install `adrlane` globally.
+2. Run `adrlane init` in a repository.
+3. Work with an agent as usual.
+4. When the agent judges that documentation should be updated, it uses the installed skills and `docs/llm/*` contract to make consistent edits under `docs/`.
+5. Developer reviews changes via `git diff` and commits normally.
 
-### 8.3 Determinism and Safety
+## 10. v1 Milestones
 
-- deterministic prompt templates for each artifact type,
-- file-scoped write plan before execution,
-- hard path guard (cannot write outside `/docs` in v1),
-- operation log for reproducibility.
+### M1: CLI and Documentation Bootstrap
 
-## 9. Git Integration
+- CLI scaffolding (`init`, optional `doctor`).
+- Documentation skeleton and `docs/llm/*` contract files.
+- Templates for ADR, spec, runbook, and changelog entries.
+- Pytest test suite for CLI and bootstrap behavior.
+- Python packaging (PEP 621), versioning, CI pipeline, and PyPI release workflow.
 
-### 9.1 Modes
+### M2: Agent Skills and Adapters
 
-- On-demand: user runs `adrlane sync`.
-- Hooked:
-  - pre-commit mode for mandatory docs gating,
-  - post-commit mode for non-blocking autonomous updates.
+- Cursor skill/rule adapter.
+- Claude Code adapter.
+- `init --agent` selection and idempotent install behavior.
 
-### 9.2 Review Flow
+### M3: Polish and Maintenance
 
-- Tool writes docs changes automatically.
-- User verifies via `git status` and `git diff`.
-- Normal commit process remains unchanged.
+- `doctor` informational checks.
+- `init --dry-run` and refresh/migrate strategy for upgraded package versions.
+- README and onboarding docs.
 
-## 10. Config (`adrlane.yml`) Draft Shape
+## 11. Acceptance Criteria (v1)
 
-```yaml
-version: 1
-docs_root: docs
-mode:
-  auto_write: true
-  dry_run_default: false
-providers:
-  default: local
-  local:
-    type: openai_compatible
-    base_url: http://localhost:1234/v1
-    api_key_env: LMSTUDIO_API_KEY
-  remote:
-    type: openai_compatible
-    base_url: https://api.openai.com/v1
-    api_key_env: OPENAI_API_KEY
-routing:
-  adr_required: remote
-  spec_update_required: remote
-  runbook_required: local
-  changelog_update_required: local
-policies:
-  require_adr_on_arch_change: true
-  require_runbook_on_deploy_change: true
-  enforce_templates: true
-hooks:
-  pre_commit: false
-  post_commit: true
-```
+- User can install `adrlane` globally and run it from any repository.
+- User can run `adrlane init` in an empty repo and get the full documentation contract and folder structure.
+- At least one supported agent adapter is installed and points to `docs/llm/*`.
+- Agents can locate, read, and update documentation consistently using the scaffolded structure.
+- Re-running `init` does not destroy existing documentation content.
 
-## 11. Quality Gates
+## 12. Open Questions
 
-Before writing success state:
+- Which two agent adapters are must-have for the first release?
+- Should `init` install all supported adapters by default, or only those selected via flags?
+- Do we need a minimal repository manifest file (e.g. `.adrlane/version`), or is `docs/llm/*` sufficient?
+- How should `init` handle upgrades when `adrlane` ships new templates or skills?
+- Should `doctor` ship in v1 or wait until after the first adapter set is stable?
 
-- all writes stay under `/docs`,
-- required templates are respected,
-- mandatory metadata headers exist,
-- markdown lint passes (if enabled),
-- operation log stored under `.adrlane/logs/`.
+## 13. Suggested Next Step
 
-## 12. Observability and Artifacts
-
-- machine-readable run report (JSON),
-- human summary in CLI output,
-- optional debug prompt trace (sanitized),
-- per-run correlation id.
-
-## 13. Security and Privacy
-
-- no silent network calls without configured provider,
-- redact secrets from logs,
-- strict environment-variable based credential loading,
-- local-first behavior by default where feasible.
-
-## 14. Packaging and Distribution
-
-- Python package built with modern PEP 621 metadata.
-- Install via `pip install adrlane`.
-- Console entry point: `adrlane`.
-- Optional extras:
-  - `adrlane[local]` for local provider helpers,
-  - `adrlane[dev]` for test/lint tooling.
-
-## 15. v1 Milestones
-
-### M1: Bootstrap and Config
-
-- CLI scaffolding (`init`, `doctor`),
-- config schema validation,
-- docs skeleton generation.
-
-### M2: Change Analyzer + Policies
-
-- Git diff parsing,
-- intent detection,
-- rule engine with configurable toggles.
-
-### M3: AI Write Path
-
-- provider adapters,
-- prompt templates,
-- constrained doc writes.
-
-### M4: Hooks + Quality Gates
-
-- pre/post commit install,
-- quality checks and run reports,
-- hardening and UX polish.
-
-## 16. Acceptance Criteria (v1)
-
-- User can run `adrlane init` in empty repo and get full docs contract.
-- User can run `adrlane sync` after code change and receive meaningful docs updates.
-- Auto-written docs appear only in `/docs` and are reviewable via Git.
-- At least one local provider and one remote provider path work end-to-end.
-- Policy engine blocks or warns based on configured rule severity.
-- Hook mode functions reliably for solo local workflow.
-
-## 17. Open Questions
-
-- Should v1 include automatic ADR supersession links?
-- Should `post-commit` mode auto-stage docs or leave unstaged?
-- How strict should template enforcement be for legacy docs imports?
-
-## 18. Suggested Next Step
-
-After creating the new repository:
-
-1. copy this spec,
-2. lock `adrlane.yml` schema,
-3. create implementation plan per milestone,
-4. implement M1 first with tests.
+1. Lock the `docs/llm/*` contract and template set.
+2. Define the first agent adapter format (Cursor first, or Claude Code first).
+3. Implement M1 (`init` + docs bootstrap).
+4. Implement M2 (agent skills).
