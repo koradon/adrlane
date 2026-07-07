@@ -5,10 +5,10 @@ labels:
 - m1
 - testing
 - pytest
-milestone: 'M1: CLI and Documentation Bootstrap'
-state: open
+milestone: 5
+state: closed
 number: 11
-state_reason: null
+state_reason: completed
 ---
 
 ## Goal

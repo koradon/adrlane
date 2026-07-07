@@ -4,10 +4,10 @@ id: adrlane-m1-issue-001
 labels:
 - m1
 - cli
-milestone: 'M1: CLI and Documentation Bootstrap'
-state: open
+milestone: 5
+state: closed
 number: 10
-state_reason: null
+state_reason: completed
 ---
 
 ## Goal

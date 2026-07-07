@@ -4,9 +4,35 @@ version = "0.1.0"
 description = "Documentation-as-code bootstrap for AI agents"
 readme = "README.md"
 requires-python = ">=3.10"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
+authors = [
+    { name = "Michał Sipa" },
+]
+keywords = ["documentation", "ai-agents", "cli", "docs-as-code"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Environment :: Console",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Topic :: Software Development :: Documentation",
+    "Topic :: Utilities",
+]
 dependencies = [
     "typer>=0.12",
 ]
+
+[project.urls]
+Homepage = "https://github.com/koradon/adrlane"
+Repository = "https://github.com/koradon/adrlane"
+Issues = "https://github.com/koradon/adrlane/issues"
 
 [project.scripts]
 adrlane = "adrlane.cli.main:app"
@@ -61,3 +87,6 @@ build-backend = "hatchling.build"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/adrlane"]
+
+[tool.hatch.build.targets.sdist]
+include = ["LICENSE"]

@@ -5,7 +5,7 @@ labels:
 - m3
 - docs
 - maintenance
-milestone: 'M3: Polish and Maintenance'
+milestone: 7
 state: open
 number: 18
 state_reason: null

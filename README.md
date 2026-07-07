@@ -56,3 +56,7 @@ uv add <package>          # runtime dependency
 uv add --dev <package>    # dev dependency
 uv lock                   # refresh lockfile after manual pyproject edits
 ```
+
+## License
+
+AGPL-3.0-or-later. See [LICENSE](LICENSE).
