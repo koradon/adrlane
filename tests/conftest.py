@@ -5,10 +5,6 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from adrlane import __version__
-from adrlane.bootstrap import run_bootstrap
-from adrlane.cli.main import app
-
 
 @pytest.fixture
 def runner() -> CliRunner:

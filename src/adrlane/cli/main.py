@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import Annotated
 
 import typer
 
@@ -20,24 +21,29 @@ def main() -> None:
 
 @app.command("init")
 def init_command(
-    path: Path = typer.Option(
-        Path.cwd(),
-        "--path",
-        "-p",
-        help="Repository root to bootstrap.",
-        exists=True,
-        file_okay=False,
-        dir_okay=True,
-        resolve_path=True,
-    ),
-    dry_run: bool = typer.Option(
-        False,
-        "--dry-run",
-        help="Show planned bootstrap actions without writing files.",
-    ),
+    path: Annotated[
+        Path | None,
+        typer.Option(
+            "--path",
+            "-p",
+            help="Repository root to bootstrap.",
+            exists=True,
+            file_okay=False,
+            dir_okay=True,
+            resolve_path=True,
+        ),
+    ] = None,
+    dry_run: Annotated[
+        bool,
+        typer.Option(
+            "--dry-run",
+            help="Show planned bootstrap actions without writing files.",
+        ),
+    ] = False,
 ) -> None:
     """Bootstrap documentation scaffolding in a repository."""
-    result = run_bootstrap(path, dry_run=dry_run)
+    target = path or Path.cwd()
+    result = run_bootstrap(target, dry_run=dry_run)
 
     if dry_run:
         typer.echo("Planned bootstrap actions:")
