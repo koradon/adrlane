@@ -17,7 +17,7 @@ Establish pytest as the test framework and cover initial CLI and init behavior.
 
 ## Tasks
 
-- Add pytest and test dependencies (`adrlane[dev]` or equivalent).
+- Add pytest and test dependencies via uv dev group (`[dependency-groups].dev`).
 - Create `tests/` layout and fixtures for invoking the CLI in isolated temp directories.
 - Write first tests for `adrlane init` (success path, `--dry-run`, idempotent re-run).
 - Wire `pytest` into local dev workflow and document how to run tests.
