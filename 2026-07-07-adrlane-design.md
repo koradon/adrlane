@@ -24,7 +24,7 @@ We need a local-first docs-as-code bootstrap tool that:
 
 ### 2.1 Primary Goals
 
-- Provide a globally installable CLI (`pipx install adrlane` or `pip install adrlane`).
+- Provide a globally installable CLI (`uv tool install adrlane` after PyPI release).
 - Bootstrap repository documentation layout and templates via `adrlane init`.
 - Install agent-specific skills/rules so agents know where to read and write documentation.
 - Encode a universal, plain-Markdown documentation contract under `docs/llm/`.
@@ -83,18 +83,21 @@ We need a local-first docs-as-code bootstrap tool that:
 
 ## 6. Installation and Distribution
 
-### 6.1 Global Install (recommended)
+### 6.1 Install
 
-Install once on the developer machine:
+Development (project contributors):
 
 ```bash
-pipx install adrlane
+uv sync
+uv run adrlane init
 ```
 
-Alternative:
+Global install on a developer machine (local checkout or after PyPI release):
 
 ```bash
-pip install adrlane
+uv tool install adrlane
+# or from a local checkout:
+uv tool install -e .
 ```
 
 ### 6.2 Per-Repository Bootstrap
@@ -110,8 +113,9 @@ adrlane init
 ### 6.3 Packaging
 
 - Python package built with modern PEP 621 metadata.
+- `uv` as the package manager (`uv.lock`, `uv sync`, `uv run`).
 - Console entry point: `adrlane`.
-- Optional extra: `adrlane[dev]` for test/lint tooling.
+- Dev dependencies in `[dependency-groups].dev` (pytest).
 - Agent skill templates ship inside the package and are copied into the repository on `init`.
 
 ## 7. Repository Contract (Docs-as-Code Standard)

@@ -19,8 +19,9 @@ Make `adrlane` installable as a proper Python package with a clear versioning sc
 
 - Add `pyproject.toml` with PEP 621 metadata and console entry point (`adrlane`).
 - Define versioning approach (e.g. semver, single source of truth for `__version__`).
-- Configure build backend (e.g. hatchling or setuptools) and verify local `pip install -e .` works.
-- Document global install path (`pipx install adrlane`).
+- Configure build backend (hatchling) and verify local `uv sync` + `uv run adrlane` works.
+- Commit and maintain `uv.lock`.
+- Document global install path (`uv tool install adrlane`).
 
 ## Depends On
 
