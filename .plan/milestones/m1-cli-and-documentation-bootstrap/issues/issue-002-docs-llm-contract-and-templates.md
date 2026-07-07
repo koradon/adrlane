@@ -4,7 +4,7 @@ id: adrlane-m1-issue-002
 labels:
 - m1
 - docs
-milestone: 'M1: CLI and Documentation Bootstrap'
+milestone: 5
 state: open
 number: 13
 state_reason: null

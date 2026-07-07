@@ -5,7 +5,7 @@ labels:
 - m2
 - cursor
 - skills
-milestone: 'M2: Agent Skills and Adapters'
+milestone: 6
 state: open
 number: 15
 state_reason: null

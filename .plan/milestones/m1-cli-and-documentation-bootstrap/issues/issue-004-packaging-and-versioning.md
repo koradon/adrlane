@@ -5,7 +5,7 @@ labels:
 - m1
 - packaging
 - versioning
-milestone: 'M1: CLI and Documentation Bootstrap'
+milestone: 5
 state: open
 number: 9
 state_reason: null

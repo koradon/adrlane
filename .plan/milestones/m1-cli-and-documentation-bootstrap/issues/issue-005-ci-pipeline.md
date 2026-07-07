@@ -5,10 +5,10 @@ labels:
 - m1
 - ci
 - github-actions
-milestone: 'M1: CLI and Documentation Bootstrap'
-state: open
+milestone: 5
+state: closed
 number: 12
-state_reason: null
+state_reason: completed
 ---
 
 ## Goal

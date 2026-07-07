@@ -5,7 +5,7 @@ labels:
 - m3
 - cli
 - doctor
-milestone: 'M3: Polish and Maintenance'
+milestone: 7
 state: open
 number: 17
 state_reason: null

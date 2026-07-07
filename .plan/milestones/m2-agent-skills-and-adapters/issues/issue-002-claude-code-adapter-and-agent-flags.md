@@ -5,7 +5,7 @@ labels:
 - m2
 - claude-code
 - cli
-milestone: 'M2: Agent Skills and Adapters'
+milestone: 6
 state: open
 number: 16
 state_reason: null
