@@ -21,6 +21,27 @@ Run tests:
 uv run pytest
 ```
 
+### Pre-commit Hooks
+
+This project uses pre-commit to run code quality checks before commits. Install
+the hooks:
+
+```bash
+uv run pre-commit install
+```
+
+The hooks will automatically run on `git commit`. They check for:
+- Code formatting and linting (ruff)
+- Trailing whitespace and end-of-file fixes
+- YAML, JSON, and TOML syntax
+- Merge conflicts and debug statements
+
+Run hooks manually on all files:
+
+```bash
+uv run pre-commit run --all-files
+```
+
 ## Global install
 
 ```bash

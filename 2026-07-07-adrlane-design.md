@@ -1,10 +1,10 @@
 # Adrlane v1 Design Spec
 
-**Status:** Draft  
-**Owner:** Michal + Agent  
-**Date:** 2026-07-07  
-**Project Name:** `adrlane`  
-**Package Target:** PyPI (`adrlane`)  
+**Status:** Draft
+**Owner:** Michal + Agent
+**Date:** 2026-07-07
+**Project Name:** `adrlane`
+**Package Target:** PyPI (`adrlane`)
 **Primary Runtime:** Local CLI (Python)
 
 ## 1. Problem Statement
@@ -51,29 +51,29 @@ We need a local-first docs-as-code bootstrap tool that:
 
 `adrlane` has three core subsystems:
 
-1. **CLI Layer**  
+1. **CLI Layer**
    Entry point commands (`init`, optional `doctor`).
 
-2. **Documentation Bootstrap**  
+2. **Documentation Bootstrap**
    Creates folder structure, templates, and canonical agent instructions in `docs/`.
 
-3. **Agent Adapters**  
+3. **Agent Adapters**
    Installs skills/rules for supported agents (e.g. Cursor, Claude Code) that point agents at the documentation contract.
 
 ## 5. Core UX and CLI
 
 ### 5.1 Commands
 
-- `adrlane init`  
+- `adrlane init`
   Bootstrap `/docs` structure, templates, `docs/llm/*` contract files, and agent skills for selected agents.
 
-- `adrlane init --agent <name>` (repeatable)  
+- `adrlane init --agent <name>` (repeatable)
   Limit or extend which agent adapters are installed (e.g. `cursor`, `claude-code`).
 
-- `adrlane init --dry-run`  
+- `adrlane init --dry-run`
   Show files and folders that would be created without writing them.
 
-- `adrlane doctor` (optional, informational)  
+- `adrlane doctor` (optional, informational)
   Check whether the repository has the expected documentation structure and agent adapters present.
 
 ### 5.2 Exit Behavior
