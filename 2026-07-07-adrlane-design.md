@@ -10,12 +10,12 @@
 ## 1. Problem Statement
 
 Teams using AI coding agents often forget to keep project documentation current while coding.
-Architecture decisions, runbooks, and implementation notes drift from real code changes.
+Architecture decisions, specifications, and implementation notes drift from real code changes.
 Agents lack a shared map of where documentation lives, how it is structured, and how to update it consistently.
 
 We need a local-first docs-as-code bootstrap tool that:
 
-- scaffolds a predictable `/docs` structure in every repository,
+- scaffolds a minimal, predictable `/docs` structure in every repository,
 - ships agent-facing instructions and skills so different agents work the same way,
 - stays agent-agnostic (Cursor, Claude Code, OpenCode, and other LLM agents),
 - leaves update decisions to the agent and developer — no automation pipeline, no enforcement.
@@ -40,6 +40,8 @@ We need a local-first docs-as-code bootstrap tool that:
 - Full docs website generator.
 - External SaaS dependency for core functionality.
 - Complex multi-repo orchestration.
+- Project-type profiles or day-zero scaffolding for CLI, web, API, etc.
+- Changelog files in `docs/` — release history lives in Git and release tooling.
 
 ## 3. Target User (v1)
 
@@ -120,41 +122,99 @@ adrlane init
 
 ## 7. Repository Contract (Docs-as-Code Standard)
 
-`adrlane init` creates:
+### 7.1 Documentation Model
 
-- `docs/README.md` — map of the documentation tree
-- `docs/adr/` — architecture decision records
-- `docs/specs/` — feature and API specifications
-- `docs/runbooks/` — operational procedures
-- `docs/changelog/` — release and change notes
-- `docs/llm/AGENT_PROTOCOL.md` — how agents should read and update docs
-- `docs/llm/DECISION_RULES.md` — when and why to create or update each doc type
-- `docs/llm/TEMPLATES.md` — required sections and naming conventions
-- `docs/llm/DOC_GUIDELINES.md` — style, metadata, and consistency guidelines
+`adrlane init` creates a **minimal core** and does not predict project shape. The documentation tree **grows with the project** — agents add new top-level sections (for example `docs/runbooks/` or `docs/reference/cli/`) only when real content warrants them.
 
-Plus agent adapter files for supported agents, for example:
+Release history is tracked in Git and release tooling, not in `docs/`.
 
-- Cursor skills under `.cursor/skills/` (or project rules, depending on final format)
-- Claude Code instructions under the path required by that tool
+#### Day-zero structure
 
-Exact adapter paths are defined per agent and may evolve independently of the core `docs/llm/` contract.
+```
+docs/
+  README.md                 # living map + growth model
+  llm/
+    AGENT_PROTOCOL.md
+    DECISION_RULES.md
+    TEMPLATES.md
+    DOC_GUIDELINES.md
+    templates/
+      spec.md
+      plan.md
+      adr-light.md
+      adr-standard.md
+      adr-full.md
+      runbook.md            # used when agent adds docs/runbooks/
+      reference.md          # used when agent adds docs/reference/
+  ideas/                    # empty, grows with project
+  roadmap/                  # Now / Next / Later horizons
+  specs/                    # empty, grows with project
+  plans/
+  adr/
+```
 
-### 7.1 Universal LLM Contract
+Plus agent adapter files for supported agents.
+
+#### Content types
+
+| Type | Location | Answers |
+| --- | --- | --- |
+| Idea | `docs/ideas/` | Early, uncommitted concepts (may be promoted or rejected) |
+| Spec | `docs/specs/` | **What** the system should do |
+| Plan | `docs/plans/` | **How** to implement a spec |
+| ADR | `docs/adr/` | **Why** a significant decision was made |
+| Roadmap | `docs/roadmap/` | Now / Next / Later horizons for future initiatives |
+
+**Idea → spec → plan workflow:**
+
+1. Write an idea when exploring a potential change before contracts are clear.
+2. Promote an accepted idea to a spec when desired behavior and contracts are clear.
+3. Create a plan from the spec when implementation spans multiple steps or sessions.
+4. Small changes may use a spec alone.
+5. Link ideas/specs/plans via a `## Related` section.
+6. When a plan finishes, set status to `completed` and optionally rename with a `.completed` suffix.
+
+**ADR tiers** (agent proposes, developer may correct):
+
+| Tier | Template | Use when |
+| --- | --- | --- |
+| light | `adr-light.md` | Obvious or local decisions (Nygard-style) |
+| standard | `adr-standard.md` | Real alternatives existed (MADR minimal) |
+| full | `adr-full.md` | Major architectural decisions (MADR full) |
+
+ADRs are numbered sequentially (`0001-short-title.md`). Numbers are never reused; superseded decisions get a new ADR with a link.
+
+#### Metadata
+
+Documents use markdown sections (`## Status`, `## Related`) — not YAML frontmatter. The tool does not parse frontmatter.
+
+#### Growth rules
+
+When the project gains a new documentation need:
+
+1. Agent adds a top-level folder under `docs/` if content does not fit specs/plans/adr/ideas/roadmap.
+2. Agent copies and adapts a template from `docs/llm/templates/`.
+3. Agent updates `docs/README.md`.
+
+Do not create empty folders "for later."
+
+### 7.2 Universal LLM Contract
 
 `docs/llm/AGENT_PROTOCOL.md` is the canonical, agent-agnostic source of truth. It defines:
 
 - where each documentation type lives,
+- how specs and plans relate,
 - how to search for existing context before writing,
 - where to append or create new documentation,
-- artifact naming conventions (ADR, spec, runbook),
-- required metadata headers,
-- update semantics (create vs append vs patch),
+- artifact naming conventions,
+- how to extend the documentation tree,
+- update semantics (create vs patch),
 - conflict policy (never delete unrelated docs),
 - language and style consistency rules.
 
 Agent-specific skills/rules are adapters: they teach the agent how to find and follow `docs/llm/*`.
 
-### 7.2 Agent Decision Model
+### 7.3 Agent Decision Model
 
 The agent decides whether documentation needs updating during normal development work.
 `adrlane` does not detect gaps, schedule updates, or write documentation on behalf of the user.
@@ -168,8 +228,9 @@ An agent skill should answer:
 
 - where documentation lives in this repository,
 - which file to read first,
-- how to update ADRs, specs, runbooks, and changelog entries,
-- which templates and guidelines to follow.
+- how to update specs, plans, and ADRs,
+- which templates and guidelines to follow,
+- how to extend the documentation tree when needed.
 
 ### 8.2 Supported Agents (v1 target)
 
@@ -200,7 +261,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 - CLI scaffolding (`init`, optional `doctor`).
 - Documentation skeleton and `docs/llm/*` contract files.
-- Templates for ADR, spec, runbook, and changelog entries.
+- Centralized templates in `docs/llm/templates/`.
 - Pytest test suite for CLI and bootstrap behavior.
 - Python packaging (PEP 621), versioning, CI pipeline, and PyPI release workflow.
 
@@ -219,7 +280,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 ## 11. Acceptance Criteria (v1)
 
 - User can install `adrlane` globally and run it from any repository.
-- User can run `adrlane init` in an empty repo and get the full documentation contract and folder structure.
+- User can run `adrlane init` in an empty repo and get the documentation contract and minimal folder structure.
 - At least one supported agent adapter is installed and points to `docs/llm/*`.
 - Agents can locate, read, and update documentation consistently using the scaffolded structure.
 - Re-running `init` does not destroy existing documentation content.
@@ -228,7 +289,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 - Which two agent adapters are must-have for the first release?
 - Should `init` install all supported adapters by default, or only those selected via flags?
-- Do we need a minimal repository manifest file (e.g. `.adrlane/version`), or is `docs/llm/*` sufficient?
+- Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?
 - How should `init` handle upgrades when `adrlane` ships new templates or skills?
 - Should `doctor` ship in v1 or wait until after the first adapter set is stable?
 
@@ -236,5 +297,4 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 1. Lock the `docs/llm/*` contract and template set.
 2. Define the first agent adapter format (Cursor first, or Claude Code first).
-3. Implement M1 (`init` + docs bootstrap).
-4. Implement M2 (agent skills).
+3. Implement M2 (agent skills).

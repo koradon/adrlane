@@ -5,9 +5,9 @@ labels:
 - m1
 - docs
 milestone: 5
-state: open
+state: closed
 number: 13
-state_reason: null
+state_reason: completed
 ---
 
 ## Goal
@@ -16,6 +16,7 @@ Generate the documentation skeleton and canonical agent instructions on `init`.
 
 ## Tasks
 
-- Create `docs/` folders (adr, specs, runbooks, changelog, llm).
+- Create `docs/` folders (specs, plans, adr, llm).
 - Ship `docs/llm/AGENT_PROTOCOL.md`, `DECISION_RULES.md`, `TEMPLATES.md`, `DOC_GUIDELINES.md`.
-- Add starter templates for ADR, spec, runbook, and changelog entries.
+- Centralize starter templates in `docs/llm/templates/` (spec, plan, adr-light/standard/full, runbook, reference).
+- Document growth model in `docs/README.md` — no changelog, no day-zero project profiles.
