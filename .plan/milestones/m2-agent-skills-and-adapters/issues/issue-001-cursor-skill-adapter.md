@@ -6,9 +6,9 @@ labels:
 - cursor
 - skills
 milestone: 6
-state: open
+state: closed
 number: 15
-state_reason: null
+state_reason: completed
 ---
 
 ## Goal

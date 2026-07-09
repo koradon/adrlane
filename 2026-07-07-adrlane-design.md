@@ -72,6 +72,12 @@ We need a local-first docs-as-code bootstrap tool that:
 - `adrlane init --agent <name>` (repeatable)
   Limit or extend which agent adapters are installed (e.g. `cursor`, `claude-code`).
 
+- `adrlane skills install --global` / `--local`
+  Install packaged agent skills in the user home directory or the current repository. `install` skips existing files.
+
+- `adrlane skills upgrade --global` / `--local`
+  Overwrite packaged agent skills after upgrading the `adrlane` package. Supports `--dry-run`.
+
 - `adrlane init --dry-run`
   Show files and folders that would be created without writing them.
 

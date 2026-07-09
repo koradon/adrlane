@@ -7,12 +7,15 @@ import typer
 
 from adrlane.agents.registry import normalize_agent_selection
 from adrlane.bootstrap import run_bootstrap
+from adrlane.cli.skills import skills_app
 
 app = typer.Typer(
     name="adrlane",
     help="Documentation-as-code bootstrap for AI agents.",
     no_args_is_help=True,
 )
+
+app.add_typer(skills_app)
 
 
 @app.callback()
