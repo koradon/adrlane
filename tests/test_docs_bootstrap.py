@@ -33,3 +33,13 @@ def test_init_does_not_overwrite_existing_docs(runner, repo: Path) -> None:
     assert result.exit_code == 0
     assert docs_readme.read_text(encoding="utf-8") == "custom docs\n"
     assert "already exists, skipped" in plain_output(result)
+
+
+def test_init_creates_ideas_and_roadmap_readmes_with_expected_topics(runner, repo: Path) -> None:
+    invoke_cli(runner, ["init", "--path", str(repo)])
+
+    ideas_readme = (repo / "docs" / "ideas" / "README.md").read_text(encoding="utf-8")
+    roadmap_readme = (repo / "docs" / "roadmap" / "README.md").read_text(encoding="utf-8")
+
+    assert "Ideas are early" in ideas_readme
+    assert "Now / Next / Later" in roadmap_readme
