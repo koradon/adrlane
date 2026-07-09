@@ -13,12 +13,17 @@ class BootstrapResult:
     skipped: list[Path]
 
 
-def run_bootstrap(target: Path, *, dry_run: bool = False) -> BootstrapResult:
+def run_bootstrap(
+    target: Path,
+    *,
+    dry_run: bool = False,
+    agents: tuple[str, ...] = (),
+) -> BootstrapResult:
     root = target.resolve()
     created: list[Path] = []
     skipped: list[Path] = []
 
-    for action in bootstrap_plan(root):
+    for action in bootstrap_plan(root, agents=agents):
         outcome = _apply_action(action, dry_run=dry_run)
         if outcome == "created":
             created.append(action.path)

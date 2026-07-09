@@ -5,6 +5,7 @@ from typing import Annotated
 
 import typer
 
+from adrlane.agents.registry import normalize_agent_selection
 from adrlane.bootstrap import run_bootstrap
 
 app = typer.Typer(
@@ -40,10 +41,27 @@ def init_command(
             help="Show planned bootstrap actions without writing files.",
         ),
     ] = False,
+    agent: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--agent",
+            help=(
+                "Agent adapter to install (repeatable). "
+                "Supported: cursor, claude-code. "
+                "Defaults to all supported agents when omitted."
+            ),
+        ),
+    ] = None,
 ) -> None:
     """Bootstrap documentation scaffolding in a repository."""
     target = path or Path.cwd()
-    result = run_bootstrap(target, dry_run=dry_run)
+
+    try:
+        agents = normalize_agent_selection(agent)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    result = run_bootstrap(target, dry_run=dry_run, agents=agents)
 
     if dry_run:
         typer.echo("Planned bootstrap actions:")
