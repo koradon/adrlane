@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 
 import pytest
+from agent_expectations import AGENT_ACTION_COUNT
 from bootstrap_expectations import BOOTSTRAP_ACTION_COUNT, EXPECTED_DOC_FILES
 from helpers import invoke_cli, plain_output
 
@@ -84,7 +85,7 @@ def test_init_after_full_bootstrap_reports_only_skipped_paths(runner, repo: Path
 
     assert first.exit_code == 0
     assert second.exit_code == 0
-    assert output.count("already exists, skipped") == BOOTSTRAP_ACTION_COUNT
+    assert output.count("already exists, skipped") == BOOTSTRAP_ACTION_COUNT + AGENT_ACTION_COUNT
     assert "  + " not in output
 
 

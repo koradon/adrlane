@@ -6,14 +6,14 @@ from adrlane.bootstrap.actions import BootstrapAction
 
 
 def template_bootstrap_actions(target: Path) -> list[BootstrapAction]:
-    """Build bootstrap actions from packaged template files."""
+    """Build bootstrap actions from packaged documentation template files."""
     actions: list[BootstrapAction] = []
-    template_root = Path(__file__).resolve().parent / "templates"
+    template_root = Path(__file__).resolve().parent / "templates" / "docs"
 
-    for relative_path, content in _iter_template_files(template_root):
+    for relative_path, content in iter_template_files(template_root):
         actions.append(
             BootstrapAction(
-                path=target / relative_path,
+                path=target / "docs" / relative_path,
                 kind="file",
                 content=content,
             )
@@ -22,7 +22,7 @@ def template_bootstrap_actions(target: Path) -> list[BootstrapAction]:
     return actions
 
 
-def _iter_template_files(root: Path) -> list[tuple[PurePosixPath, str]]:
+def iter_template_files(root: Path) -> list[tuple[PurePosixPath, str]]:
     files_found: list[tuple[PurePosixPath, str]] = []
 
     for path in sorted(root.rglob("*")):

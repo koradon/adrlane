@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from agent_expectations import AGENT_ACTION_COUNT
 from bootstrap_expectations import (
     BOOTSTRAP_ACTION_COUNT,
     EXPECTED_DOC_DIRS,
@@ -16,6 +17,12 @@ def test_bootstrap_plan_returns_expected_action_count(repo: Path) -> None:
     actions = bootstrap_plan(repo)
 
     assert len(actions) == BOOTSTRAP_ACTION_COUNT
+
+
+def test_bootstrap_plan_includes_agent_actions_when_requested(repo: Path) -> None:
+    actions = bootstrap_plan(repo, agents=("cursor", "claude-code"))
+
+    assert len(actions) == BOOTSTRAP_ACTION_COUNT + AGENT_ACTION_COUNT
 
 
 def test_bootstrap_plan_starts_with_marker_directory_and_version_file(repo: Path) -> None:

@@ -21,6 +21,13 @@ Templates live in `docs/llm/templates/`. Documents use markdown sections (`## St
 
 When the project gains new documentation needs (CLI reference, runbooks, API docs), the **agent adds** new folders under `docs/` and updates `docs/README.md`. `init` does not predict project type or scaffold empty sections.
 
+By default, `init` also installs five agent skills for Cursor and Claude Code:
+
+- `adrlane-dev-context` — ambient: read specs before coding, propose ADRs after significant decisions
+- `adrlane-write-idea`, `adrlane-write-spec`, `adrlane-write-plan`, `adrlane-write-adr` — explicit documentation tasks
+
+Use `--agent cursor` or `--agent claude-code` (repeatable) to limit which adapters are installed.
+
 Release history stays in Git and release tooling — not in `docs/`.
 
 ## Requirements
@@ -33,6 +40,7 @@ Release history stays in Git and release tooling — not in `docs/`.
 uv sync
 uv run adrlane --help
 uv run adrlane init --path /path/to/target-repo
+uv run adrlane init --path /path/to/target-repo --agent cursor
 uv run adrlane init --path /path/to/target-repo --dry-run
 ```
 

@@ -2,6 +2,20 @@
 
 This file is the canonical, agent-agnostic contract for working with documentation in this repository.
 
+## Agent skills (installed by `adrlane init`)
+
+If this repository was bootstrapped with adrlane, agent-specific skills may be present:
+
+| Skill | Role |
+| --- | --- |
+| `adrlane-dev-context` | Ambient: read specs before coding; propose ADRs after significant decisions |
+| `adrlane-write-idea` | Write or update ideas in `docs/ideas/` |
+| `adrlane-write-spec` | Write or update specs in `docs/specs/` |
+| `adrlane-write-plan` | Write or update plans in `docs/plans/` |
+| `adrlane-write-adr` | Document decisions in `docs/adr/` |
+
+Skills are thin adapters; this file and `docs/llm/DECISION_RULES.md` remain the source of truth.
+
 ## Where documentation lives
 
 | Type | Location | When to use |

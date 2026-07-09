@@ -246,6 +246,9 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 - Canonical rules live in `docs/llm/*`.
 - Agent skills are concise adapters that reference those files.
 - Skills are copied/generated during `init`, not fetched from a remote service.
+- v1 installs five skills per supported agent:
+  - **ambient:** `adrlane-dev-context` — read specs before coding; propose ADRs when a significant decision settles in conversation.
+  - **explicit:** `adrlane-write-idea`, `adrlane-write-spec`, `adrlane-write-plan`, `adrlane-write-adr`.
 
 ## 9. Developer Workflow
 
@@ -265,11 +268,13 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 - Pytest test suite for CLI and bootstrap behavior.
 - Python packaging (PEP 621), versioning, CI pipeline, and PyPI release workflow.
 
-### M2: Agent Skills and Adapters
+### M2: Agent Skills and Adapters (done)
 
-- Cursor skill/rule adapter.
-- Claude Code adapter.
-- `init --agent` selection and idempotent install behavior.
+- Five shared skills installed per agent adapter: `adrlane-dev-context` (ambient) plus `adrlane-write-idea`, `adrlane-write-spec`, `adrlane-write-plan`, `adrlane-write-adr` (explicit).
+- Cursor paths: `.cursor/skills/<skill-name>/SKILL.md`.
+- Claude Code paths: `.claude/skills/<skill-name>/SKILL.md`.
+- `init --agent` selection (repeatable); defaults to both supported agents.
+- Idempotent adapter install when `init` is re-run.
 
 ### M3: Polish and Maintenance
 
@@ -287,14 +292,12 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 ## 12. Open Questions
 
-- Which two agent adapters are must-have for the first release?
-- Should `init` install all supported adapters by default, or only those selected via flags?
 - Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?
 - How should `init` handle upgrades when `adrlane` ships new templates or skills?
 - Should `doctor` ship in v1 or wait until after the first adapter set is stable?
 
 ## 13. Suggested Next Step
 
-1. Lock the `docs/llm/*` contract and template set.
-2. Define the first agent adapter format (Cursor first, or Claude Code first).
-3. Implement M2 (agent skills).
+1. Implement M3 (`doctor`, upgrade/migrate strategy).
+2. Expand test coverage for CLI `--agent` edge cases if needed.
+3. Publish first PyPI release when CI and packaging are green.
