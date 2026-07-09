@@ -89,4 +89,4 @@ build-backend = "hatchling.build"
 packages = ["src/adrlane"]
 
 [tool.hatch.build.targets.sdist]
-include = ["LICENSE"]
+only-include = ["src/adrlane", "LICENSE", "pyproject.toml", "README.md"]

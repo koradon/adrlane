@@ -1,32 +1,15 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
 from pathlib import Path
 
 from adrlane import __version__
-
-
-@dataclass(frozen=True)
-class BootstrapAction:
-    path: Path
-    kind: str
-    content: str | None = None
-
-    def describe(self) -> str:
-        if self.kind == "dir":
-            return f"create directory: {self.path}"
-        if self.kind == "file":
-            return f"create file: {self.path}"
-        raise ValueError(f"unknown bootstrap action kind: {self.kind}")
+from adrlane.bootstrap.actions import BootstrapAction
+from adrlane.bootstrap.templates_loader import template_bootstrap_actions
 
 
 def bootstrap_plan(target: Path) -> list[BootstrapAction]:
-    """Return bootstrap actions for a repository root.
-
-    Docs and agent contract files are added in a follow-up issue; this
-    establishes the bootstrap marker and directory layout hook.
-    """
-    return [
+    """Return bootstrap actions for a repository root."""
+    actions: list[BootstrapAction] = [
         BootstrapAction(path=target / ".adrlane", kind="dir"),
         BootstrapAction(
             path=target / ".adrlane" / "bootstrap-version",
@@ -34,3 +17,7 @@ def bootstrap_plan(target: Path) -> list[BootstrapAction]:
             content=f"{__version__}\n",
         ),
     ]
+    for name in ("specs", "plans", "adr", "ideas", "roadmap"):
+        actions.append(BootstrapAction(path=target / "docs" / name, kind="dir"))
+    actions.extend(template_bootstrap_actions(target))
+    return actions

@@ -3,7 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from adrlane.bootstrap.plan import BootstrapAction, bootstrap_plan
+from adrlane.bootstrap.actions import BootstrapAction
+from adrlane.bootstrap.plan import bootstrap_plan
 
 
 @dataclass(frozen=True)

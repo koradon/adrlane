@@ -2,6 +2,27 @@
 
 Documentation-as-code bootstrap for AI agents.
 
+`adrlane init` scaffolds a minimal `docs/` layout and an agent-facing contract so AI tools know where to read and write project documentation. The agent decides when to update docs — there is no sync pipeline or enforcement.
+
+## Documentation model
+
+`init` creates a **minimal core** that grows with the project:
+
+| Path | Purpose |
+| --- | --- |
+| `docs/specs/` | What the system should do |
+| `docs/plans/` | How to implement a spec |
+| `docs/adr/` | Why significant decisions were made |
+| `docs/ideas/` | Early concepts that may be promoted to specs |
+| `docs/roadmap/` | Now / Next / Later horizons for future initiatives |
+| `docs/llm/` | Agent contract and templates |
+
+Templates live in `docs/llm/templates/`. Documents use markdown sections (`## Status`, `## Related`) — not YAML frontmatter.
+
+When the project gains new documentation needs (CLI reference, runbooks, API docs), the **agent adds** new folders under `docs/` and updates `docs/README.md`. `init` does not predict project type or scaffold empty sections.
+
+Release history stays in Git and release tooling — not in `docs/`.
+
 ## Requirements
 
 - [uv](https://docs.astral.sh/uv/)

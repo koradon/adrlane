@@ -6,9 +6,9 @@ labels:
 - packaging
 - versioning
 milestone: 5
-state: open
+state: closed
 number: 9
-state_reason: null
+state_reason: completed
 ---
 
 ## Goal
