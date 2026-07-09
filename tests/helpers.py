@@ -16,4 +16,4 @@ def invoke_cli(runner: CliRunner, args: Sequence[str]) -> Result:
 
 
 def plain_output(result: Result) -> str:
-    return _ANSI_ESCAPE.sub("", result.stdout)
+    return _ANSI_ESCAPE.sub("", f"{result.stdout}{result.stderr}")

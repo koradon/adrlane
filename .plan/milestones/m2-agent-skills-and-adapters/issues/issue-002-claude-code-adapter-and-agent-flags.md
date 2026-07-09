@@ -6,9 +6,9 @@ labels:
 - claude-code
 - cli
 milestone: 6
-state: open
+state: closed
 number: 16
-state_reason: null
+state_reason: completed
 ---
 
 ## Goal

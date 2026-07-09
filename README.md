@@ -28,6 +28,21 @@ By default, `init` also installs five agent skills for Cursor and Claude Code:
 
 Use `--agent cursor` or `--agent claude-code` (repeatable) to limit which adapters are installed.
 
+For a single global install across all projects:
+
+```bash
+adrlane skills install --global
+```
+
+Update global or per-repo skills after upgrading `adrlane`:
+
+```bash
+adrlane skills upgrade --global
+cd my-repo && adrlane skills upgrade --local
+```
+
+`skills install --local` must be run from an adrlane repository root.
+
 Release history stays in Git and release tooling — not in `docs/`.
 
 ## Requirements
@@ -41,6 +56,8 @@ uv sync
 uv run adrlane --help
 uv run adrlane init --path /path/to/target-repo
 uv run adrlane init --path /path/to/target-repo --agent cursor
+uv run adrlane skills install --global
+uv run adrlane skills upgrade --local
 uv run adrlane init --path /path/to/target-repo --dry-run
 ```
 
