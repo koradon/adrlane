@@ -25,18 +25,6 @@ def main() -> None:
 
 @app.command("init")
 def init_command(
-    path: Annotated[
-        Path | None,
-        typer.Option(
-            "--path",
-            "-p",
-            help="Repository root to bootstrap.",
-            exists=True,
-            file_okay=False,
-            dir_okay=True,
-            resolve_path=True,
-        ),
-    ] = None,
     dry_run: Annotated[
         bool,
         typer.Option(
@@ -56,8 +44,8 @@ def init_command(
         ),
     ] = None,
 ) -> None:
-    """Bootstrap documentation scaffolding in a repository."""
-    target = path or Path.cwd()
+    """Bootstrap documentation scaffolding in the current repository."""
+    target = Path.cwd().resolve()
 
     try:
         agents = normalize_agent_selection(agent)

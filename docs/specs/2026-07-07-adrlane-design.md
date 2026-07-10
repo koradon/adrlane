@@ -67,7 +67,7 @@ We need a local-first docs-as-code bootstrap tool that:
 ### 5.1 Commands
 
 - `adrlane init`
-  Bootstrap `/docs` structure, templates, `docs/llm/*` contract files, and agent skills for selected agents.
+  Bootstrap `/docs` structure, templates, `docs/llm/*` contract files, and agent skills for selected agents. Run from the target repository root (uses the current working directory).
 
 - `adrlane init --agent <name>` (repeatable)
   Limit or extend which agent adapters are installed (e.g. `cursor`, `claude-code`).

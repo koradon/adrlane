@@ -17,5 +17,11 @@ def repo(tmp_path: Path) -> Path:
 
 
 @pytest.fixture
+def in_repo(repo: Path, monkeypatch) -> Path:
+    monkeypatch.chdir(repo)
+    return repo
+
+
+@pytest.fixture
 def bootstrap_marker(repo: Path) -> Path:
     return repo / ".adrlane" / "bootstrap-version"
