@@ -18,12 +18,13 @@ def run_bootstrap(
     *,
     dry_run: bool = False,
     agents: tuple[str, ...] = (),
+    workspace: bool = False,
 ) -> BootstrapResult:
     root = target.resolve()
     created: list[Path] = []
     skipped: list[Path] = []
 
-    for action in bootstrap_plan(root, agents=agents):
+    for action in bootstrap_plan(root, agents=agents, workspace=workspace):
         outcome = _apply_action(action, dry_run=dry_run)
         if outcome == "created":
             created.append(action.path)

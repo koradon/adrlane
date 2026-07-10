@@ -31,6 +31,7 @@ def test_init_help(runner) -> None:
     assert result.exit_code == 0
     assert "--dry-run" in output
     assert "--agent" in output
+    assert "--workspace" in output
     assert "--path" not in output
 
 

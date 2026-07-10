@@ -13,6 +13,7 @@ If this repository was bootstrapped with adrlane, agent-specific skills may be p
 | `adrlane-write-spec` | Write or update specs in `docs/specs/` |
 | `adrlane-write-plan` | Write or update plans in `docs/plans/` |
 | `adrlane-write-adr` | Document decisions in `docs/adr/` |
+| `adrlane-workspace-routing` | Route docs to project or sub-repo trees when `.adrlane/workspace.yaml` exists |
 
 Skills are thin adapters; this file and `docs/llm/DECISION_RULES.md` remain the source of truth.
 
