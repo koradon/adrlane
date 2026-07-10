@@ -68,3 +68,13 @@ def test_bootstrap_plan_template_files_have_content(repo: Path) -> None:
             continue
         assert action.content
         assert action.content.strip()
+
+
+def test_bootstrap_plan_workspace_adds_workspace_config(repo: Path) -> None:
+    from bootstrap_expectations import WORKSPACE_BOOTSTRAP_ACTION_COUNT
+
+    actions = bootstrap_plan(repo, workspace=True)
+    file_paths = {action.path for action in actions if action.kind == "file"}
+
+    assert len(actions) == WORKSPACE_BOOTSTRAP_ACTION_COUNT
+    assert repo / ".adrlane" / "workspace.yaml" in file_paths

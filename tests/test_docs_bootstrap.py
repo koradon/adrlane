@@ -43,3 +43,22 @@ def test_init_creates_ideas_and_roadmap_readmes_with_expected_topics(runner, in_
 
     assert "Ideas are early" in ideas_readme
     assert "Now / Next / Later" in roadmap_readme
+
+
+def test_init_workspace_creates_workspace_config(runner, in_repo: Path) -> None:
+    result = invoke_cli(runner, ["init", "--workspace"])
+
+    assert result.exit_code == 0
+    workspace_config = in_repo / ".adrlane" / "workspace.yaml"
+    assert workspace_config.is_file()
+    content = workspace_config.read_text(encoding="utf-8")
+    assert "project_docs: docs" in content
+    assert "repo_roots" in content
+
+
+def test_init_without_workspace_flag_does_not_create_workspace_config(
+    runner, in_repo: Path
+) -> None:
+    invoke_cli(runner, ["init"])
+
+    assert not (in_repo / ".adrlane" / "workspace.yaml").exists()

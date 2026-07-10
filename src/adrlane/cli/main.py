@@ -43,6 +43,16 @@ def init_command(
             ),
         ),
     ] = None,
+    workspace: Annotated[
+        bool,
+        typer.Option(
+            "--workspace",
+            help=(
+                "Enable multi-repo workspace routing "
+                "(creates .adrlane/workspace.yaml at the workspace root)."
+            ),
+        ),
+    ] = False,
 ) -> None:
     """Bootstrap documentation scaffolding in the current repository."""
     target = Path.cwd().resolve()
@@ -52,7 +62,7 @@ def init_command(
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
 
-    result = run_bootstrap(target, dry_run=dry_run, agents=agents)
+    result = run_bootstrap(target, dry_run=dry_run, agents=agents, workspace=workspace)
 
     if dry_run:
         typer.echo("Planned bootstrap actions:")

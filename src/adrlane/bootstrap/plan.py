@@ -7,10 +7,16 @@ from adrlane.bootstrap.actions import BootstrapAction
 from adrlane.bootstrap.agents_loader import agent_bootstrap_actions
 from adrlane.bootstrap.templates_loader import template_bootstrap_actions
 
+_WORKSPACE_CONFIG_TEMPLATE = (
+    Path(__file__).resolve().parent / "templates" / ".adrlane" / "workspace.yaml"
+)
+
 
 def bootstrap_plan(
     target: Path,
     agents: tuple[str, ...] = (),
+    *,
+    workspace: bool = False,
 ) -> list[BootstrapAction]:
     """Return bootstrap actions for a repository root."""
     actions: list[BootstrapAction] = [
@@ -24,6 +30,14 @@ def bootstrap_plan(
     for name in ("specs", "plans", "adr", "ideas", "roadmap"):
         actions.append(BootstrapAction(path=target / "docs" / name, kind="dir"))
     actions.extend(template_bootstrap_actions(target))
+    if workspace:
+        actions.append(
+            BootstrapAction(
+                path=target / ".adrlane" / "workspace.yaml",
+                kind="file",
+                content=_WORKSPACE_CONFIG_TEMPLATE.read_text(encoding="utf-8"),
+            )
+        )
     if agents:
         actions.extend(agent_bootstrap_actions(target, agents))
     return actions

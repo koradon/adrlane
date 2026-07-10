@@ -6,6 +6,7 @@ AGENT_SKILL_NAMES = (
     "adrlane-write-spec",
     "adrlane-write-plan",
     "adrlane-write-adr",
+    "adrlane-workspace-routing",
 )
 
 AGENT_SKILL_PREFIX = {
