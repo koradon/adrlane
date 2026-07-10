@@ -2,11 +2,92 @@
 
 Documentation-as-code bootstrap for AI agents.
 
-`adrlane init` scaffolds a minimal `docs/` layout and an agent-facing contract so AI tools know where to read and write project documentation. The agent decides when to update docs — there is no sync pipeline or enforcement.
+`adrlane` scaffolds a minimal `docs/` layout and agent skills so AI tools know where to read and write project documentation. The agent decides when to update docs — there is no sync pipeline or enforcement.
 
-## Documentation model
+## Install
 
-`init` creates a **minimal core** that grows with the project:
+### Global CLI (recommended)
+
+Install `adrlane` once on your machine with [uv](https://docs.astral.sh/uv/):
+
+```bash
+uv tool install adrlane
+```
+
+From a local checkout:
+
+```bash
+uv tool install -e .
+```
+
+Verify:
+
+```bash
+adrlane --help
+```
+
+### Development checkout
+
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/koradon/adrlane.git
+cd adrlane
+uv sync
+uv run adrlane --help
+```
+
+## Quick start
+
+Run these commands from your **project repository root**:
+
+```bash
+cd /path/to/your-project
+
+# 1. Scaffold docs and install project-local agent skills
+adrlane init
+
+# 2. Optional: install skills globally (one copy for all projects)
+adrlane skills install --global
+```
+
+Preview changes without writing files:
+
+```bash
+adrlane init --dry-run
+```
+
+Limit which agent adapters `init` installs:
+
+```bash
+adrlane init --agent cursor
+adrlane init --agent cursor --agent claude-code
+```
+
+After upgrading the `adrlane` package, refresh skills:
+
+```bash
+adrlane skills upgrade --global
+adrlane skills upgrade --local   # run from a bootstrapped repo
+```
+
+## Commands
+
+| Command | Description |
+| --- | --- |
+| `adrlane init` | Bootstrap `docs/` and install agent skills in the current repository |
+| `adrlane init --dry-run` | Show planned bootstrap actions without writing files |
+| `adrlane init --agent <name>` | Limit adapters (`cursor`, `claude-code`; repeatable) |
+| `adrlane skills install --global` | Install skills in `~/.cursor/skills/` and `~/.claude/skills/` |
+| `adrlane skills install --local` | Install skills in the current repository (skips existing files) |
+| `adrlane skills upgrade --global` | Overwrite global skills with the current package version |
+| `adrlane skills upgrade --local` | Overwrite local skills in the current repository |
+
+`init` and `skills --local` always use the **current working directory** — there is no `--path` flag. Change into the target repository first.
+
+## What `init` creates
+
+`init` scaffolds a **minimal core** that grows with the project:
 
 | Path | Purpose |
 | --- | --- |
@@ -14,52 +95,34 @@ Documentation-as-code bootstrap for AI agents.
 | `docs/plans/` | How to implement a spec |
 | `docs/adr/` | Why significant decisions were made |
 | `docs/ideas/` | Early concepts that may be promoted to specs |
-| `docs/roadmap/` | Now / Next / Later horizons for future initiatives |
-| `docs/llm/` | Agent contract and templates |
+| `docs/roadmap/` | Now / Next / Later horizons |
+| `docs/llm/` | Agent contract, decision rules, and templates |
 
 Templates live in `docs/llm/templates/`. Documents use markdown sections (`## Status`, `## Related`) — not YAML frontmatter.
 
-When the project gains new documentation needs (CLI reference, runbooks, API docs), the **agent adds** new folders under `docs/` and updates `docs/README.md`. `init` does not predict project type or scaffold empty sections.
-
-By default, `init` also installs five agent skills for Cursor and Claude Code:
-
-- `adrlane-dev-context` — ambient: read specs before coding, propose ADRs after significant decisions
-- `adrlane-write-idea`, `adrlane-write-spec`, `adrlane-write-plan`, `adrlane-write-adr` — explicit documentation tasks
-
-Use `--agent cursor` or `--agent claude-code` (repeatable) to limit which adapters are installed.
-
-For a single global install across all projects:
-
-```bash
-adrlane skills install --global
-```
-
-Update global or per-repo skills after upgrading `adrlane`:
-
-```bash
-adrlane skills upgrade --global
-cd my-repo && adrlane skills upgrade --local
-```
-
-`skills install --local` must be run from an adrlane repository root.
+When the project gains new documentation needs (runbooks, API reference, CLI docs), the **agent adds** new folders under `docs/` and updates `docs/README.md`. `init` does not predict project type.
 
 Release history stays in Git and release tooling — not in `docs/`.
 
-## Requirements
+## Agent skills
 
-- [uv](https://docs.astral.sh/uv/)
+By default, `init` installs five skills for Cursor and Claude Code:
 
-## Development
+| Skill | Role |
+| --- | --- |
+| `adrlane-dev-context` | Ambient — read specs before coding; propose ADRs after significant decisions |
+| `adrlane-write-idea` | Write or update ideas |
+| `adrlane-write-spec` | Write or update specs (and Gherkin `.feature` files) |
+| `adrlane-write-plan` | Write or update implementation plans |
+| `adrlane-write-adr` | Document architectural decisions |
 
-```bash
-uv sync
-uv run adrlane --help
-uv run adrlane init --path /path/to/target-repo
-uv run adrlane init --path /path/to/target-repo --agent cursor
-uv run adrlane skills install --global
-uv run adrlane skills upgrade --local
-uv run adrlane init --path /path/to/target-repo --dry-run
-```
+**Project-local** (default via `init`): `.cursor/skills/` and `.claude/skills/` in the repository.
+
+**Global** (optional via `skills install --global`): same skills in your home directory, shared across all projects.
+
+Skills are thin adapters; the canonical contract lives in `docs/llm/AGENT_PROTOCOL.md` and `docs/llm/DECISION_RULES.md`.
+
+## Contributing
 
 Run tests:
 
@@ -67,35 +130,14 @@ Run tests:
 uv run pytest
 ```
 
-### Pre-commit Hooks
-
-This project uses pre-commit to run code quality checks before commits. Install
-the hooks:
+Install pre-commit hooks:
 
 ```bash
 uv run pre-commit install
-```
-
-The hooks will automatically run on `git commit`. They check for:
-- Code formatting and linting (ruff)
-- Trailing whitespace and end-of-file fixes
-- YAML, JSON, and TOML syntax
-- Merge conflicts and debug statements
-
-Run hooks manually on all files:
-
-```bash
 uv run pre-commit run --all-files
 ```
 
-## Global install
-
-```bash
-uv tool install -e .
-adrlane init --path /path/to/target-repo
-```
-
-## Dependency management
+Dependency management:
 
 ```bash
 uv add <package>          # runtime dependency
