@@ -1,0 +1,14 @@
+# Multi-repo documentation routing (adrlane workspace mode)
+# Used by the adrlane-workspace-routing agent skill.
+
+# Cross-cutting docs at the workspace root (platform ADRs, shared specs, roadmap).
+project_docs: docs
+
+# Optional: group repositories under subdirectories (e.g. services/, frontends/).
+# When omitted or empty, repositories are direct children of the workspace root:
+#   project/repo1/, project/repo2/, …
+#
+# repo_roots:
+#   - services
+#   - frontends
+#   - libs

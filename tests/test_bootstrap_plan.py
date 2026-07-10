@@ -73,6 +73,10 @@ def test_bootstrap_plan_template_files_have_content(repo: Path) -> None:
 def test_bootstrap_plan_workspace_adds_workspace_config(repo: Path) -> None:
     from bootstrap_expectations import WORKSPACE_BOOTSTRAP_ACTION_COUNT
 
+    from adrlane.bootstrap.plan import _WORKSPACE_CONFIG_TEMPLATE
+
+    assert _WORKSPACE_CONFIG_TEMPLATE.is_file()
+
     actions = bootstrap_plan(repo, workspace=True)
     file_paths = {action.path for action in actions if action.kind == "file"}
 

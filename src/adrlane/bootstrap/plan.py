@@ -8,7 +8,7 @@ from adrlane.bootstrap.agents_loader import agent_bootstrap_actions
 from adrlane.bootstrap.templates_loader import template_bootstrap_actions
 
 _WORKSPACE_CONFIG_TEMPLATE = (
-    Path(__file__).resolve().parent / "templates" / ".adrlane" / "workspace.yaml"
+    Path(__file__).resolve().parent / "templates" / "workspace" / "workspace.yaml"
 )
 
 
