@@ -51,4 +51,4 @@ verbs share a single `run_skills` code path.
 
 - Decision context: `docs/adr/0002-agent-agnostic-contract-with-thin-adapters.md`
 - Milestone: `.plan/milestones/m2-agent-skills-and-adapters/issues/issue-003-global-and-local-skills-cli.md`
-- Design spec: `2026-07-07-adrlane-design.md` (§5.1 Commands)
+- Design spec: `20260707-adrlane-design.md` (§5.1 Commands)
