@@ -45,4 +45,4 @@ performance.
 ## Related
 
 - Config: `pyproject.toml`
-- Design spec: `2026-07-07-adrlane-design.md` (Primary Runtime: Local CLI (Python))
+- Design spec: `20260707-adrlane-design.md` (Primary Runtime: Local CLI (Python))

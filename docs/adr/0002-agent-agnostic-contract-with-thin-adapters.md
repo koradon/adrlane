@@ -51,6 +51,6 @@ at the contract, keeping behavior identical across agents.
 
 ## Related
 
-- Design spec: `2026-07-07-adrlane-design.md` (§4 High-Level Architecture — Agent Adapters)
+- Design spec: `20260707-adrlane-design.md` (§4 High-Level Architecture — Agent Adapters)
 - Milestone: `.plan/milestones/m2-agent-skills-and-adapters/milestone.md`
 - Agent contract: `docs/llm/AGENT_PROTOCOL.md`
