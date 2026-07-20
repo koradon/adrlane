@@ -6,8 +6,10 @@ from typing import Annotated
 import typer
 
 from adrlane.agents.registry import normalize_agent_selection
+from adrlane.agents.skills import is_adrlane_repository
 from adrlane.bootstrap import run_bootstrap
 from adrlane.cli.skills import skills_app
+from adrlane.upgrade import run_upgrade
 
 app = typer.Typer(
     name="adrlane",
@@ -75,4 +77,54 @@ def init_command(
         typer.echo(f"  ~ {item} (already exists, skipped)")
 
     if not result.created and not result.skipped:
+        typer.echo("  (no actions)")
+
+
+@app.command("upgrade")
+def upgrade_command(
+    dry_run: Annotated[
+        bool,
+        typer.Option(
+            "--dry-run",
+            help="Show planned upgrade actions without writing files.",
+        ),
+    ] = False,
+    agent: Annotated[
+        list[str] | None,
+        typer.Option(
+            "--agent",
+            help=(
+                "Agent adapter to upgrade (repeatable). "
+                "Supported: cursor, claude-code. "
+                "Defaults to all supported agents when omitted."
+            ),
+        ),
+    ] = None,
+) -> None:
+    """Refresh docs/llm/* contract files, bootstrap-version, and agent skills."""
+    target = Path.cwd().resolve()
+
+    if not is_adrlane_repository(target):
+        raise typer.BadParameter(
+            "Current directory is not an adrlane repository. Run `adrlane init` first."
+        )
+
+    try:
+        agents = normalize_agent_selection(agent)
+    except ValueError as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    result = run_upgrade(target, agents, dry_run=dry_run)
+
+    if dry_run:
+        typer.echo("Planned upgrade actions:")
+    else:
+        typer.echo("Upgrade complete.")
+
+    for item in result.created:
+        typer.echo(f"  + {item}")
+    for item in result.updated:
+        typer.echo(f"  * {item} (updated)")
+
+    if not result.created and not result.updated:
         typer.echo("  (no actions)")

@@ -78,6 +78,9 @@ We need a local-first docs-as-code bootstrap tool that:
 - `adrlane skills upgrade --global` / `--local`
   Overwrite packaged agent skills after upgrading the `adrlane` package. Supports `--dry-run`.
 
+- `adrlane upgrade`
+  Refresh package-owned bootstrap content after upgrading the `adrlane` package: overwrites `docs/llm/*` contract files, `.adrlane/bootstrap-version`, and local agent skills (equivalent to `skills upgrade --local`). Supports `--dry-run` and `--agent`. Never touches user-owned content — `docs/README.md`, `docs/ideas/README.md`, `docs/roadmap/README.md`, the contents of `docs/{specs,plans,adr,ideas,roadmap}`, or `.adrlane/workspace.yaml`. Requires an existing `.adrlane/` bootstrap (run `init` first).
+
 - `adrlane init --dry-run`
   Show files and folders that would be created without writing them.
 
@@ -285,7 +288,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 ### M3: Polish and Maintenance
 
 - `doctor` informational checks.
-- `init --dry-run` and refresh/migrate strategy for upgraded package versions.
+- `init --dry-run` and refresh/migrate strategy for upgraded package versions (done: `adrlane upgrade`).
 - README and onboarding docs.
 
 ## 11. Acceptance Criteria (v1)
@@ -299,7 +302,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 ## 12. Open Questions
 
 - Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?
-- How should `init` handle upgrades when `adrlane` ships new templates or skills?
+- ~~How should `init` handle upgrades when `adrlane` ships new templates or skills?~~ Resolved: `init` stays purely additive/idempotent; `adrlane upgrade` refreshes package-owned content (see [ADR 0005](../adr/0005-dedicated-upgrade-command-for-package-owned-content.md)).
 - Should `doctor` ship in v1 or wait until after the first adapter set is stable?
 
 ## 13. Suggested Next Step
