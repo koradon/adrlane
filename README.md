@@ -87,8 +87,13 @@ adrlane skills upgrade --local   # run from a bootstrapped repo
 | `adrlane skills install --local` | Install skills in the current repository (skips existing files) |
 | `adrlane skills upgrade --global` | Overwrite global skills with the current package version |
 | `adrlane skills upgrade --local` | Overwrite local skills in the current repository |
+| `adrlane upgrade` | Refresh `docs/llm/*` contract files, `.adrlane/bootstrap-version`, and local agent skills after upgrading the `adrlane` package |
+| `adrlane upgrade --dry-run` | Show planned upgrade actions without writing files |
+| `adrlane upgrade --agent <name>` | Limit which agent adapters get their skills refreshed (repeatable) |
 
 `init` and `skills --local` always use the **current working directory** — there is no `--path` flag. Change into the target repository first.
+
+`init` never overwrites existing files, so re-running it after upgrading the `adrlane` package won't refresh stale `docs/llm/*` contract files. Run `adrlane upgrade` for that. It never touches user-owned content: `docs/README.md`, `docs/ideas/README.md`, `docs/roadmap/README.md`, the contents of `docs/{specs,plans,adr,ideas,roadmap}`, or `.adrlane/workspace.yaml`.
 
 ## What `init` creates
 
