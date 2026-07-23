@@ -84,8 +84,8 @@ We need a local-first docs-as-code bootstrap tool that:
 - `adrlane init --dry-run`
   Show files and folders that would be created without writing them.
 
-- `adrlane doctor` (optional, informational)
-  Check whether the repository has the expected documentation structure and agent adapters present.
+- `adrlane doctor` (informational)
+  Check whether the repository has the expected documentation structure and agent adapters present. Read-only and non-blocking: always exits `0`.
 
 ### 5.2 Exit Behavior
 
@@ -271,7 +271,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 ### M1: CLI and Documentation Bootstrap
 
-- CLI scaffolding (`init`, optional `doctor`).
+- CLI scaffolding (`init`, `doctor`).
 - Documentation skeleton and `docs/llm/*` contract files.
 - Centralized templates in `docs/llm/templates/`.
 - Pytest test suite for CLI and bootstrap behavior.
@@ -287,7 +287,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 ### M3: Polish and Maintenance
 
-- `doctor` informational checks.
+- `doctor` informational checks. (done)
 - `init --dry-run` and refresh/migrate strategy for upgraded package versions (done: `adrlane upgrade`).
 - README and onboarding docs.
 
@@ -303,7 +303,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 - Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?
 - ~~How should `init` handle upgrades when `adrlane` ships new templates or skills?~~ Resolved: `init` stays purely additive/idempotent; `adrlane upgrade` refreshes package-owned content (see [ADR 0005](../adr/0005-dedicated-upgrade-command-for-package-owned-content.md)).
-- Should `doctor` ship in v1 or wait until after the first adapter set is stable?
+- ~~Should `doctor` ship in v1 or wait until after the first adapter set is stable?~~ Resolved: shipped in v1 as an informational, non-blocking check.
 
 ## 13. Suggested Next Step
 

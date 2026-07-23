@@ -92,7 +92,15 @@ def _bootstrap_version_check(root: Path) -> DoctorCheck:
             detail="Missing. Run `adrlane upgrade` to record the installed version.",
         )
 
-    installed = marker.read_text(encoding="utf-8").strip()
+    try:
+        installed = marker.read_text(encoding="utf-8").strip()
+    except (OSError, UnicodeDecodeError) as exc:
+        return DoctorCheck(
+            name=name,
+            ok=False,
+            detail=f"Could not read {name}: {exc}",
+        )
+
     if installed != __version__:
         return DoctorCheck(
             name=name,
@@ -126,18 +134,31 @@ def _agent_adapter_checks(root: Path) -> list[DoctorCheck]:
                         ),
                     )
                 )
-            elif action.path.read_text(encoding="utf-8") != action.content:
-                checks.append(
-                    DoctorCheck(
-                        name=str(relative),
-                        ok=False,
-                        detail=(
-                            f"Outdated. Run `adrlane upgrade --agent {agent_name}` to refresh it."
-                        ),
-                    )
-                )
             else:
-                checks.append(DoctorCheck(name=str(relative), ok=True))
+                try:
+                    current_content = action.path.read_text(encoding="utf-8")
+                except (OSError, UnicodeDecodeError) as exc:
+                    checks.append(
+                        DoctorCheck(
+                            name=str(relative),
+                            ok=False,
+                            detail=f"Could not read {relative}: {exc}",
+                        )
+                    )
+                    continue
+
+                if current_content != action.content:
+                    checks.append(
+                        DoctorCheck(
+                            name=str(relative),
+                            ok=False,
+                            detail=(
+                                f"Outdated. Run `adrlane upgrade --agent {agent_name}` to refresh it."
+                            ),
+                        )
+                    )
+                else:
+                    checks.append(DoctorCheck(name=str(relative), ok=True))
 
     if not any_installed:
         checks.append(
@@ -157,7 +178,16 @@ def _workspace_config_check(root: Path) -> DoctorCheck | None:
         return None
 
     name = ".adrlane/workspace.yaml"
-    if not workspace_path.read_text(encoding="utf-8").strip():
+    try:
+        content = workspace_path.read_text(encoding="utf-8")
+    except (OSError, UnicodeDecodeError) as exc:
+        return DoctorCheck(
+            name=name,
+            ok=False,
+            detail=f"Could not read {name}: {exc}",
+        )
+
+    if not content.strip():
         return DoctorCheck(
             name=name,
             ok=False,
