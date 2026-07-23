@@ -301,7 +301,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 ## 12. Open Questions
 
-- Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?
+- ~~Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?~~ Resolved: yes, `.adrlane/bootstrap-version` is tracked and refreshed by `adrlane upgrade` (see [ADR 0005](../adr/0005-dedicated-upgrade-command-for-package-owned-content.md)).
 - ~~How should `init` handle upgrades when `adrlane` ships new templates or skills?~~ Resolved: `init` stays purely additive/idempotent; `adrlane upgrade` refreshes package-owned content (see [ADR 0005](../adr/0005-dedicated-upgrade-command-for-package-owned-content.md)).
 - Should `doctor` ship in v1 or wait until after the first adapter set is stable?
 
