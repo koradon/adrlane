@@ -54,7 +54,7 @@ We need a local-first docs-as-code bootstrap tool that:
 `adrlane` has three core subsystems:
 
 1. **CLI Layer**
-   Entry point commands (`init`, optional `doctor`).
+   Entry point commands (`init`, `doctor`).
 
 2. **Documentation Bootstrap**
    Creates folder structure, templates, and canonical agent instructions in `docs/`.
@@ -301,12 +301,11 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 ## 12. Open Questions
 
-- Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?
+- ~~Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?~~ Resolved: yes — `upgrade` writes it and `doctor` checks it against the installed package version.
 - ~~How should `init` handle upgrades when `adrlane` ships new templates or skills?~~ Resolved: `init` stays purely additive/idempotent; `adrlane upgrade` refreshes package-owned content (see [ADR 0005](../adr/0005-dedicated-upgrade-command-for-package-owned-content.md)).
 - ~~Should `doctor` ship in v1 or wait until after the first adapter set is stable?~~ Resolved: shipped in v1 as an informational, non-blocking check.
 
 ## 13. Suggested Next Step
 
-1. Implement M3 (`doctor`, upgrade/migrate strategy).
-2. Expand test coverage for CLI `--agent` edge cases if needed.
-3. Publish first PyPI release when CI and packaging are green.
+1. Expand test coverage for CLI `--agent` edge cases if needed.
+2. Publish first PyPI release when CI and packaging are green.

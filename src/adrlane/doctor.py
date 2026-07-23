@@ -153,7 +153,8 @@ def _agent_adapter_checks(root: Path) -> list[DoctorCheck]:
                             name=str(relative),
                             ok=False,
                             detail=(
-                                f"Outdated. Run `adrlane upgrade --agent {agent_name}` to refresh it."
+                                f"Outdated. Run `adrlane upgrade --agent {agent_name}` "
+                                "to refresh it."
                             ),
                         )
                     )
