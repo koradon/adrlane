@@ -17,6 +17,10 @@ If this repository was bootstrapped with adrlane, agent-specific skills may be p
 
 Skills are thin adapters; this file and `docs/llm/DECISION_RULES.md` remain the source of truth.
 
+## Who decides when to update
+
+The agent decides whether documentation needs updating during normal development. There is no adrlane sync job or gap detector. When behavior, decisions, or structure change in a way that should be recorded, use the installed skills and this contract to create or patch files under `docs/`. The developer reviews changes via `git diff` and commits.
+
 ## Where documentation lives
 
 | Type | Location | When to use |
