@@ -289,7 +289,7 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 - `doctor` informational checks.
 - `init --dry-run` and refresh/migrate strategy for upgraded package versions (done: `adrlane upgrade`).
-- README and onboarding docs.
+- README and onboarding docs (done: global install + per-repo `init`, upgrade path, agent decision model).
 
 ## 11. Acceptance Criteria (v1)
 
@@ -301,12 +301,12 @@ Additional adapters (e.g. OpenCode) can follow the same pattern without changing
 
 ## 12. Open Questions
 
-- Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?
+- ~~Do we need a minimal repository manifest file (e.g. `.adrlane/bootstrap-version`), or is `docs/llm/*` sufficient?~~ Resolved: yes, `.adrlane/bootstrap-version` is tracked and refreshed by `adrlane upgrade` (see [ADR 0005](../adr/0005-dedicated-upgrade-command-for-package-owned-content.md)).
 - ~~How should `init` handle upgrades when `adrlane` ships new templates or skills?~~ Resolved: `init` stays purely additive/idempotent; `adrlane upgrade` refreshes package-owned content (see [ADR 0005](../adr/0005-dedicated-upgrade-command-for-package-owned-content.md)).
 - Should `doctor` ship in v1 or wait until after the first adapter set is stable?
 
 ## 13. Suggested Next Step
 
-1. Implement M3 (`doctor`, upgrade/migrate strategy).
+1. Finish remaining M3 work (`doctor` informational checks).
 2. Expand test coverage for CLI `--agent` edge cases if needed.
 3. Publish first PyPI release when CI and packaging are green.

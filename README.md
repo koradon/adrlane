@@ -39,23 +39,30 @@ uv run adrlane --help
 
 ## Quick start
 
-Run these commands from your **project repository root**:
+1. Install the CLI globally (see [Install](#install)).
+2. From your **project repository root**, scaffold docs and project-local skills:
 
 ```bash
 cd /path/to/your-project
-
-# 1. Scaffold docs and install project-local agent skills
 adrlane init
+```
 
-# Multi-repo workspace (project root is not a single git repo):
-adrlane init --workspace   # adds .adrlane/workspace.yaml for doc routing
-# Then run `adrlane init` in each sub-repository for service-level docs.
+3. Optional: install skills once for all projects on this machine:
 
-# 2. Optional: install skills globally (one copy for all projects)
+```bash
 adrlane skills install --global
 ```
 
-Preview changes without writing files:
+4. Work with your agent as usual. When docs should change, the agent uses the installed skills (see [Agent workflow](#agent-workflow)).
+
+Multi-repo workspace (project root is not a single git repo):
+
+```bash
+adrlane init --workspace   # adds .adrlane/workspace.yaml for doc routing
+# Then run `adrlane init` in each sub-repository for service-level docs.
+```
+
+Preview without writing files:
 
 ```bash
 adrlane init --dry-run
@@ -68,12 +75,33 @@ adrlane init --agent cursor
 adrlane init --agent cursor --agent claude-code
 ```
 
-After upgrading the `adrlane` package, refresh skills:
+`init` and `skills --local` always use the **current working directory** — there is no `--path` flag.
+
+## Upgrading
+
+`init` is additive: it never overwrites an existing file. After you upgrade the `adrlane` package, re-running `init` will not refresh stale `docs/llm/*` contracts or skills. Use `upgrade` for that.
 
 ```bash
+# 1. Upgrade the installed CLI
+uv tool upgrade adrlane
+
+# 2. In each bootstrapped repository: refresh package-owned content
+cd /path/to/your-project
+adrlane upgrade
+
+# 3. If you use global skills, refresh those too
 adrlane skills upgrade --global
-adrlane skills upgrade --local   # run from a bootstrapped repo
 ```
+
+`adrlane upgrade` overwrites:
+
+- `docs/llm/*` contract files and templates
+- `.adrlane/bootstrap-version`
+- local agent skill files (same as `skills upgrade --local`)
+
+It never touches user-owned content: `docs/README.md`, `docs/ideas/README.md`, `docs/roadmap/README.md`, the contents of `docs/{specs,plans,adr,ideas,roadmap}`, or `.adrlane/workspace.yaml`.
+
+Preview: `adrlane upgrade --dry-run`. Details: [ADR 0005](docs/adr/0005-dedicated-upgrade-command-for-package-owned-content.md).
 
 ## Commands
 
@@ -91,11 +119,20 @@ adrlane skills upgrade --local   # run from a bootstrapped repo
 | `adrlane upgrade --dry-run` | Show planned upgrade actions without writing files |
 | `adrlane upgrade --agent <name>` | Limit which agent adapters get their skills refreshed (repeatable) |
 
-`init` and `skills --local` always use the **current working directory** — there is no `--path` flag. Change into the target repository first.
+## Agent workflow
 
-`init` never overwrites existing files, so re-running it after upgrading the `adrlane` package won't refresh stale `docs/llm/*` contract files. Run `adrlane upgrade` for that. It never touches user-owned content: `docs/README.md`, `docs/ideas/README.md`, `docs/roadmap/README.md`, the contents of `docs/{specs,plans,adr,ideas,roadmap}`, or `.adrlane/workspace.yaml`.
+`adrlane` does not detect documentation gaps, schedule updates, or write docs on its own. The **agent** decides when documentation needs updating during normal development.
 
-## What `init` creates
+Typical loop:
+
+1. Developer installs `adrlane` and runs `adrlane init` once per repository.
+2. Developer works with Cursor or Claude Code as usual.
+3. When the agent judges that behavior, decisions, or structure should be recorded, it uses the installed skills and `docs/llm/*` to create or patch files under `docs/`.
+4. Developer reviews with `git diff` and commits normally.
+
+Skills are thin adapters; the contract is `docs/llm/AGENT_PROTOCOL.md` and `docs/llm/DECISION_RULES.md`.
+
+## Documentation model
 
 `init` scaffolds a **minimal core** that grows with the project:
 

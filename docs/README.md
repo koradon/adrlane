@@ -31,4 +31,4 @@ For the full growth model, see the [adrlane documentation model](https://github.
 
 ## For agents
 
-Read `docs/llm/AGENT_PROTOCOL.md` first. It defines the doc workflow (`idea -> spec -> plan`) and how to extend the documentation consistently.
+Read `docs/llm/AGENT_PROTOCOL.md` first. It defines who decides when to update docs, the doc workflow (`idea -> spec -> plan`), and how to extend the documentation consistently.
