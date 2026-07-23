@@ -9,6 +9,7 @@ from adrlane.agents.registry import normalize_agent_selection
 from adrlane.agents.skills import is_adrlane_repository
 from adrlane.bootstrap import run_bootstrap
 from adrlane.cli.skills import skills_app
+from adrlane.doctor import run_doctor
 from adrlane.upgrade import run_upgrade
 
 app = typer.Typer(
@@ -128,3 +129,25 @@ def upgrade_command(
 
     if not result.created and not result.updated:
         typer.echo("  (no actions)")
+
+
+@app.command("doctor")
+def doctor_command() -> None:
+    """Report documentation and agent-adapter health. Informational only: never fails."""
+    target = Path.cwd().resolve()
+    report = run_doctor(target)
+
+    typer.echo("Documentation health check:")
+    for check in report.checks:
+        marker = "ok" if check.ok else "warn"
+        line = f"  [{marker}] {check.name}"
+        if check.detail:
+            line += f" — {check.detail}"
+        typer.echo(line)
+
+    issue_count = len(report.issues)
+    typer.echo("")
+    if issue_count:
+        typer.echo(f"{issue_count} issue(s) found.")
+    else:
+        typer.echo("No issues found.")
