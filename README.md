@@ -90,6 +90,7 @@ adrlane skills upgrade --local   # run from a bootstrapped repo
 | `adrlane upgrade` | Refresh `docs/llm/*` contract files, `.adrlane/bootstrap-version`, and local agent skills after upgrading the `adrlane` package |
 | `adrlane upgrade --dry-run` | Show planned upgrade actions without writing files |
 | `adrlane upgrade --agent <name>` | Limit which agent adapters get their skills refreshed (repeatable) |
+| `adrlane doctor` | Report docs/agent-adapter drift (informational only, never fails) |
 
 `init` and `skills --local` always use the **current working directory** — there is no `--path` flag. Change into the target repository first.
 
