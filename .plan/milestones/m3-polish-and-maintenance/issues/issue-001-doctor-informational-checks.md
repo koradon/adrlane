@@ -6,9 +6,9 @@ labels:
 - cli
 - doctor
 milestone: 7
-state: open
+state: closed
 number: 17
-state_reason: null
+state_reason: completed
 ---
 
 ## Goal

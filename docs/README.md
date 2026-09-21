@@ -6,6 +6,7 @@ This repository uses a docs-as-code layout bootstrapped by [adrlane](https://git
 
 | Path | Purpose |
 | --- | --- |
+| `docs/architecture.md` | How adrlane works internally: requirements, execution flow, modules, modes, diagrams |
 | `docs/specs/` | Feature specifications, behavior, and contracts |
 | `docs/plans/` | Implementation plans derived from specs |
 | `docs/adr/` | Architecture and design decision records |

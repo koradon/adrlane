@@ -57,6 +57,22 @@ Propose a tier; the developer may correct it.
 
 Number ADRs sequentially (`0001-short-title.md`). Do not reuse numbers. When superseding a decision, add a new ADR and link to the replaced one.
 
+## Architecture overview (`docs/architecture.md`)
+
+Create or refresh the architecture overview when:
+
+- a new contributor or agent would benefit from a single map of how the whole system works today
+- explicitly asked ("explain the architecture", "generate an architecture overview")
+- proactively, right after a change that alters module boundaries, execution flow, or requirements to run — same trigger moment as an ADR proposal
+
+An architecture overview answers **how the system works right now** — not why a decision was made (ADR) or what it should do (spec). Copy the template from `docs/llm/templates/architecture.md`.
+
+Include as many diagrams as needed to visualize the system (module map, data/request flow, deployment) — do not force a fixed number, and skip a diagram that would not add clarity.
+
+There is exactly one architecture overview per repository (`docs/architecture.md`). When it already exists, patch only the sections that are stale instead of rewriting the whole document.
+
+When you create the file for the first time, add a row for it to `docs/README.md`.
+
 ## Roadmap (`docs/roadmap/`)
 
 Create or update roadmap docs when you need a shared view of future initiatives without exact dates.

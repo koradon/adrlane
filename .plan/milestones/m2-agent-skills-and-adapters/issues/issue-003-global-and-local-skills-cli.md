@@ -6,8 +6,8 @@ labels:
 - cli
 - skills
 milestone: 6
-state: open
-state_reason: null
+state: closed
+state_reason: completed
 number: 25
 ---
 
