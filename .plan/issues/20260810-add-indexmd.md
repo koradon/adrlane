@@ -4,6 +4,7 @@ number: 33
 assignees:
 - koradon
 state: open
+state_reason: null
 ---
 
 Add INDEX.md for each directory for quicker project scans for LLMs.

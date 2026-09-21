@@ -19,6 +19,7 @@ EXPECTED_DOC_FILES = [
     "docs/llm/templates/runbook.md",
     "docs/llm/templates/reference.md",
     "docs/llm/templates/architecture.md",
+    "docs/llm/templates/index.md",
 ]
 
 EXPECTED_DOC_DIRS = [

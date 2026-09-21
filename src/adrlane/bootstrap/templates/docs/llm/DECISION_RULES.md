@@ -13,6 +13,8 @@ An idea answers **what outcome you're considering** and **whether it's worth pur
 
 Promote an idea to a spec when behavior/contracts are clear. If it should not proceed, set `## Status` to `rejected`.
 
+Add or update its row in `docs/ideas/INDEX.md` (see [Per-directory INDEX.md](TEMPLATES.md#per-directory-indexmd)).
+
 ## Spec (`docs/specs/`)
 
 Create or update a spec when a change affects:
@@ -22,6 +24,8 @@ Create or update a spec when a change affects:
 - data formats or boundaries between components
 
 A spec answers **what** should be true. Copy the template from `docs/llm/templates/spec.md`.
+
+Add or update its row in `docs/specs/INDEX.md` (see [Per-directory INDEX.md](TEMPLATES.md#per-directory-indexmd)).
 
 ## Plan (`docs/plans/`)
 
@@ -36,6 +40,8 @@ A plan answers **how** to build what the spec describes. Copy from `docs/llm/tem
 Skip a plan for small, obvious changes that a spec alone can describe.
 
 When finishing a plan, set status to `completed` and optionally rename with a `.completed` suffix.
+
+Add or update its row in `docs/plans/INDEX.md` (see [Per-directory INDEX.md](TEMPLATES.md#per-directory-indexmd)).
 
 ## ADR (`docs/adr/`)
 
@@ -56,6 +62,8 @@ An ADR answers **why** a decision was made. Choose a template tier:
 Propose a tier; the developer may correct it.
 
 Number ADRs sequentially (`0001-short-title.md`). Do not reuse numbers. When superseding a decision, add a new ADR and link to the replaced one.
+
+Add or update its row in `docs/adr/INDEX.md` (see [Per-directory INDEX.md](TEMPLATES.md#per-directory-indexmd)).
 
 ## Architecture overview (`docs/architecture.md`)
 
@@ -80,6 +88,8 @@ Create or update roadmap docs when you need a shared view of future initiatives 
 Use the Now / Next / Later horizons and link each roadmap item to related Idea / Spec / Plan docs.
 
 If you need more detailed horizon pages beyond `docs/roadmap/README.md`, copy from `docs/llm/templates/roadmap.md` and adapt it.
+
+If you add horizon pages, add or update their rows in `docs/roadmap/INDEX.md` (see [Per-directory INDEX.md](TEMPLATES.md#per-directory-indexmd)).
 
 ## Extending the documentation tree
 

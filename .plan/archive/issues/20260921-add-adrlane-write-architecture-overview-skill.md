@@ -1,9 +1,9 @@
 ---
 title: Add adrlane-write-architecture-overview skill
 number: 35
-state: open
+state: closed
 assignees: []
-state_reason: null
+state_reason: completed
 ---
 
 Adds a 7th packaged agent skill, `adrlane-write-architecture-overview`, so any repo bootstrapped
