@@ -14,6 +14,10 @@ This repository uses a docs-as-code layout bootstrapped by [adrlane](https://git
 | `docs/roadmap/` | Now / Next / Later horizons for future initiatives |
 | `docs/llm/` | Agent-facing documentation contract and templates |
 
+`docs/specs/`, `docs/plans/`, `docs/adr/`, `docs/ideas/`, and `docs/roadmap/` each keep an
+`INDEX.md` listing the files inside once they have their first entry — see
+[ADR-0007](adr/0007-per-directory-index-md-hand-maintained-no-frontmatter.md).
+
 ## How this documentation grows
 
 `adrlane init` creates a minimal core and does not predict future project shape.
