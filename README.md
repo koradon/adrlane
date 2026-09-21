@@ -150,11 +150,13 @@ Templates live in `docs/llm/templates/`. Documents use markdown sections (`## St
 
 When the project gains new documentation needs (runbooks, API reference, CLI docs), the **agent adds** new folders under `docs/` and updates `docs/README.md`. `init` does not predict project type.
 
+One exception grows outside that minimal core on request rather than by default: the `adrlane-write-architecture-overview` skill creates or refreshes a single `docs/architecture.md` — a whole-system overview with diagrams — when asked, or proactively after a change that alters module boundaries, execution flow, or requirements to run.
+
 Release history stays in Git and release tooling — not in `docs/`.
 
 ## Agent skills
 
-By default, `init` installs six skills for Cursor and Claude Code:
+By default, `init` installs seven skills for Cursor and Claude Code:
 
 | Skill | Role |
 | --- | --- |
@@ -163,6 +165,7 @@ By default, `init` installs six skills for Cursor and Claude Code:
 | `adrlane-write-spec` | Write or update specs (and Gherkin `.feature` files) |
 | `adrlane-write-plan` | Write or update implementation plans |
 | `adrlane-write-adr` | Document architectural decisions |
+| `adrlane-write-architecture-overview` | Create or refresh `docs/architecture.md`, the whole-system overview |
 | `adrlane-workspace-routing` | Route docs to project or sub-repo trees (when `.adrlane/workspace.yaml` exists) |
 
 **Project-local** (default via `init`): `.cursor/skills/` and `.claude/skills/` in the repository.

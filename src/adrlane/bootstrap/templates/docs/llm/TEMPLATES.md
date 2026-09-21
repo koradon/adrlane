@@ -16,6 +16,7 @@ All starter templates live in `docs/llm/templates/`. Copy the relevant file when
 | Roadmap | `docs/llm/templates/roadmap.md` | Now / Next / Later horizon pages |
 | Runbook | `docs/llm/templates/runbook.md` | Operations when `docs/runbooks/` exists |
 | Reference | `docs/llm/templates/reference.md` | CLI/API/config reference when added |
+| Architecture overview | `docs/llm/templates/architecture.md` | Single whole-system overview: how it works, requirements, modes |
 
 ## File naming
 
@@ -31,6 +32,7 @@ All starter templates live in `docs/llm/templates/`. Copy the relevant file when
 | Roadmap (horizon page) | `now.md` / `next.md` / `later.md` | `now.md` |
 | Runbook | `short-operation-name.md` | `local-development.md` |
 | Reference | `short-topic-name.md` | `cli-commands.md` |
+| Architecture overview | `architecture.md` (fixed name, one per repo) | `architecture.md` |
 
 Use lowercase kebab-case for new files unless an existing convention differs.
 
@@ -58,6 +60,7 @@ Common sections:
 | Plan | `draft`, `active`, `completed`, `superseded` |
 | ADR | `proposed`, `accepted`, `deprecated`, `superseded` |
 | Roadmap | `draft`, `active` |
+| Architecture overview | `current`, `stale` |
 
 ## Update semantics
 
