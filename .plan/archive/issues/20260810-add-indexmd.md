@@ -3,8 +3,8 @@ title: Add INDEX.md
 number: 33
 assignees:
 - koradon
-state: open
-state_reason: null
+state: closed
+state_reason: completed
 ---
 
 Add INDEX.md for each directory for quicker project scans for LLMs.
