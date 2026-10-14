@@ -4,7 +4,7 @@ from typing import Annotated
 
 import typer
 
-from adrlane.agents.registry import normalize_agent_selection
+from adrlane.agents.registry import SUPPORTED_AGENTS_HELP, normalize_agent_selection
 from adrlane.agents.skills import (
     SkillsResult,
     SkillsScope,
@@ -67,7 +67,7 @@ def skills_install_command(
             "--agent",
             help=(
                 "Agent adapter to install (repeatable). "
-                "Supported: cursor, claude-code. "
+                f"Supported: {SUPPORTED_AGENTS_HELP}. "
                 "Defaults to all supported agents when omitted."
             ),
         ),
@@ -109,7 +109,7 @@ def skills_upgrade_command(
             "--agent",
             help=(
                 "Agent adapter to upgrade (repeatable). "
-                "Supported: cursor, claude-code. "
+                f"Supported: {SUPPORTED_AGENTS_HELP}. "
                 "Defaults to all supported agents when omitted."
             ),
         ),

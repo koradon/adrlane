@@ -11,6 +11,8 @@ from agent_expectations import (
 )
 from helpers import invoke_cli, plain_output
 
+from adrlane.agents.registry import SUPPORTED_AGENTS
+
 
 def test_init_help_lists_agent_flag(runner) -> None:
     result = invoke_cli(runner, ["init", "--help"])
@@ -24,7 +26,7 @@ def test_init_installs_all_agent_adapters_by_default(runner, in_repo: Path) -> N
     result = invoke_cli(runner, ["init"])
 
     assert result.exit_code == 0
-    for agent in ("cursor", "claude-code"):
+    for agent in SUPPORTED_AGENTS:
         for relative_path in agent_skill_paths(agent):
             assert (in_repo / relative_path).is_file()
 
@@ -43,6 +45,15 @@ def test_init_installs_only_claude_code_adapter_when_selected(runner, in_repo: P
 
     assert result.exit_code == 0
     for relative_path in agent_skill_paths("claude-code"):
+        assert (in_repo / relative_path).is_file()
+    assert not (in_repo / agent_skill_path("cursor", AGENT_SKILL_NAMES[0])).exists()
+
+
+def test_init_installs_only_codex_adapter_when_selected(runner, in_repo: Path) -> None:
+    result = invoke_cli(runner, ["init", "--agent", "codex"])
+
+    assert result.exit_code == 0
+    for relative_path in agent_skill_paths("codex"):
         assert (in_repo / relative_path).is_file()
     assert not (in_repo / agent_skill_path("cursor", AGENT_SKILL_NAMES[0])).exists()
 
@@ -86,7 +97,7 @@ def test_init_does_not_overwrite_existing_cursor_skill(runner, in_repo: Path) ->
     assert "already exists, skipped" in plain_output(result)
 
 
-@pytest.mark.parametrize("agent_name", ["cursor", "claude-code"])
+@pytest.mark.parametrize("agent_name", SUPPORTED_AGENTS)
 def test_init_agent_skills_reference_docs_contract(
     runner,
     in_repo: Path,
