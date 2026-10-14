@@ -12,19 +12,35 @@ from agent_expectations import (
     agent_skill_paths,
 )
 
-from adrlane.agents.registry import normalize_agent_selection, validate_agent_names
+from adrlane.agents.registry import (
+    AGENT_ADAPTERS,
+    SUPPORTED_AGENTS,
+    normalize_agent_selection,
+    validate_agent_names,
+)
 from adrlane.bootstrap import run_bootstrap
 from adrlane.bootstrap.agents_loader import agent_bootstrap_actions
 
 
 def test_normalize_agent_selection_defaults_to_all_supported_agents() -> None:
-    assert normalize_agent_selection(None) == ("cursor", "claude-code")
+    assert normalize_agent_selection(None) == ("cursor", "claude-code", "codex")
 
 
 def test_normalize_agent_selection_deduplicates_while_preserving_order() -> None:
     selected = normalize_agent_selection(["cursor", "claude-code", "cursor"])
 
     assert selected == ("cursor", "claude-code")
+
+
+# Codex CLI only scans `.codex/skills`; a wrong prefix here silently hides every
+# adrlane skill from Codex, which is exactly the bug this adapter fixes.
+def test_codex_adapter_installs_into_dot_codex_skills() -> None:
+    assert AGENT_ADAPTERS["codex"].skill_prefix == ".codex/skills"
+
+
+def test_existing_adapters_keep_their_skill_prefixes() -> None:
+    assert AGENT_ADAPTERS["cursor"].skill_prefix == ".cursor/skills"
+    assert AGENT_ADAPTERS["claude-code"].skill_prefix == ".claude/skills"
 
 
 def test_validate_agent_names_rejects_unknown_agent() -> None:
@@ -41,19 +57,28 @@ def test_agent_bootstrap_actions_installs_all_cursor_skills(repo: Path) -> None:
         assert repo / agent_skill_path("cursor", skill_name) in paths
 
 
-def test_agent_bootstrap_actions_installs_both_agent_skills(repo: Path) -> None:
-    actions = agent_bootstrap_actions(repo, ("cursor", "claude-code"))
+def test_agent_bootstrap_actions_installs_every_agent_skills(repo: Path) -> None:
+    actions = agent_bootstrap_actions(repo, SUPPORTED_AGENTS)
 
     assert len(actions) == AGENT_ACTION_COUNT
-    for agent in ("cursor", "claude-code"):
+    for agent in SUPPORTED_AGENTS:
         for relative_path in agent_skill_paths(agent):
             assert repo / relative_path in {action.path for action in actions}
+
+
+def test_agent_bootstrap_actions_installs_all_codex_skills(repo: Path) -> None:
+    actions = agent_bootstrap_actions(repo, ("codex",))
+
+    assert len(actions) == SKILLS_PER_AGENT
+    paths = {action.path for action in actions}
+    for skill_name in AGENT_SKILL_NAMES:
+        assert repo / f".codex/skills/{skill_name}/SKILL.md" in paths
 
 
 def test_run_bootstrap_without_agents_does_not_install_skills(repo: Path) -> None:
     run_bootstrap(repo)
 
-    for agent in ("cursor", "claude-code"):
+    for agent in SUPPORTED_AGENTS:
         for relative_path in agent_skill_paths(agent):
             assert not (repo / relative_path).exists()
 

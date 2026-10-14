@@ -95,6 +95,15 @@ def test_run_skills_install_writes_global_skills(tmp_path: Path) -> None:
         assert (tmp_path / relative_path).is_file()
 
 
+# A global codex install resolves to `~/.codex/skills`, which is the default
+# `$CODEX_HOME/skills` that Codex CLI scans as its user-level skill root.
+def test_run_skills_install_writes_global_codex_skills_under_dot_codex(tmp_path: Path) -> None:
+    result = run_skills(tmp_path, ("codex",), upgrade=False)
+
+    assert len(result.created) == SKILLS_PER_AGENT
+    assert (tmp_path / ".codex" / "skills" / "adrlane-dev-context" / "SKILL.md").is_file()
+
+
 def test_run_skills_upgrade_dry_run_does_not_write(repo: Path) -> None:
     run_bootstrap(repo, agents=("cursor",))
     skill_path = repo / agent_skill_path("cursor", "adrlane-dev-context")

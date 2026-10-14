@@ -13,6 +13,7 @@ AGENT_SKILL_NAMES = (
 AGENT_SKILL_PREFIX = {
     "cursor": ".cursor/skills",
     "claude-code": ".claude/skills",
+    "codex": ".codex/skills",
 }
 
 
@@ -28,6 +29,7 @@ def agent_skill_paths(agent: str) -> list[str]:
 AGENT_SKILL_FILES = {
     "cursor": agent_skill_path("cursor", "adrlane-dev-context"),
     "claude-code": agent_skill_path("claude-code", "adrlane-dev-context"),
+    "codex": agent_skill_path("codex", "adrlane-dev-context"),
 }
 
 SKILLS_PER_AGENT = len(AGENT_SKILL_NAMES)

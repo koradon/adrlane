@@ -9,3 +9,4 @@
 | [0005](0005-dedicated-upgrade-command-for-package-owned-content.md) | Dedicated `adrlane upgrade` command for package-owned content | accepted |
 | [0006](0006-repo-identity-must-not-assume-a-single-checkout-path.md) | Repo identity must not assume a single checkout path | accepted |
 | [0007](0007-per-directory-index-md-hand-maintained-no-frontmatter.md) | Per-directory INDEX.md, hand-maintained, no YAML frontmatter | accepted |
+| [0008](0008-codex-adapter-installs-into-repo-local-dot-codex-skills.md) | Codex adapter installs into repo-local `.codex/skills` | accepted |

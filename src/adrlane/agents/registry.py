@@ -2,8 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-SUPPORTED_AGENTS = ("cursor", "claude-code")
+SUPPORTED_AGENTS = ("cursor", "claude-code", "codex")
 DEFAULT_AGENTS = SUPPORTED_AGENTS
+
+SUPPORTED_AGENTS_HELP = ", ".join(SUPPORTED_AGENTS)
 
 
 @dataclass(frozen=True)
@@ -15,15 +17,20 @@ class AgentAdapter:
 AGENT_ADAPTERS: dict[str, AgentAdapter] = {
     "cursor": AgentAdapter(name="cursor", skill_prefix=".cursor/skills"),
     "claude-code": AgentAdapter(name="claude-code", skill_prefix=".claude/skills"),
+    # Codex CLI scans `<repo>/.codex/skills` as a project-local skill root and
+    # `$CODEX_HOME/skills` (default `~/.codex/skills`) as the user-level one, so the
+    # same prefix serves both the --local and --global scopes.
+    "codex": AgentAdapter(name="codex", skill_prefix=".codex/skills"),
 }
 
 
 def validate_agent_names(agent_names: list[str]) -> list[str]:
     unknown = sorted({name for name in agent_names if name not in AGENT_ADAPTERS})
     if unknown:
-        supported = ", ".join(SUPPORTED_AGENTS)
         unknown_list = ", ".join(unknown)
-        raise ValueError(f"Unknown agent(s): {unknown_list}. Supported agents: {supported}.")
+        raise ValueError(
+            f"Unknown agent(s): {unknown_list}. Supported agents: {SUPPORTED_AGENTS_HELP}."
+        )
     return agent_names
 
 

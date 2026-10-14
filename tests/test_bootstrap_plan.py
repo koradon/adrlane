@@ -10,6 +10,7 @@ from bootstrap_expectations import (
 )
 
 from adrlane import __version__
+from adrlane.agents.registry import SUPPORTED_AGENTS
 from adrlane.bootstrap.plan import bootstrap_plan
 
 
@@ -20,7 +21,7 @@ def test_bootstrap_plan_returns_expected_action_count(repo: Path) -> None:
 
 
 def test_bootstrap_plan_includes_agent_actions_when_requested(repo: Path) -> None:
-    actions = bootstrap_plan(repo, agents=("cursor", "claude-code"))
+    actions = bootstrap_plan(repo, agents=SUPPORTED_AGENTS)
 
     assert len(actions) == BOOTSTRAP_ACTION_COUNT + AGENT_ACTION_COUNT
 
