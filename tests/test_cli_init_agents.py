@@ -58,6 +58,15 @@ def test_init_installs_only_codex_adapter_when_selected(runner, in_repo: Path) -
     assert not (in_repo / agent_skill_path("cursor", AGENT_SKILL_NAMES[0])).exists()
 
 
+def test_init_installs_only_agy_adapter_when_selected(runner, in_repo: Path) -> None:
+    result = invoke_cli(runner, ["init", "--agent", "agy"])
+
+    assert result.exit_code == 0
+    for relative_path in agent_skill_paths("agy"):
+        assert (in_repo / relative_path).is_file()
+    assert not (in_repo / agent_skill_path("cursor", AGENT_SKILL_NAMES[0])).exists()
+
+
 def test_init_supports_repeatable_agent_flag(runner, in_repo: Path) -> None:
     result = invoke_cli(
         runner,

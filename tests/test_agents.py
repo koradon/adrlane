@@ -23,7 +23,7 @@ from adrlane.bootstrap.agents_loader import agent_bootstrap_actions
 
 
 def test_normalize_agent_selection_defaults_to_all_supported_agents() -> None:
-    assert normalize_agent_selection(None) == ("cursor", "claude-code", "codex")
+    assert normalize_agent_selection(None) == ("cursor", "claude-code", "codex", "agy")
 
 
 def test_normalize_agent_selection_deduplicates_while_preserving_order() -> None:
@@ -41,6 +41,21 @@ def test_codex_adapter_installs_into_dot_codex_skills() -> None:
 def test_existing_adapters_keep_their_skill_prefixes() -> None:
     assert AGENT_ADAPTERS["cursor"].skill_prefix == ".cursor/skills"
     assert AGENT_ADAPTERS["claude-code"].skill_prefix == ".claude/skills"
+
+
+# Antigravity (agy) only scans `.agents/skills` locally and `~/.gemini/config/skills`
+# globally; a wrong prefix on either scope silently hides every adrlane skill from it.
+def test_agy_adapter_installs_into_dot_agents_skills_locally() -> None:
+    assert AGENT_ADAPTERS["agy"].skill_prefix == ".agents/skills"
+
+
+def test_agy_adapter_uses_a_distinct_global_skill_prefix() -> None:
+    assert AGENT_ADAPTERS["agy"].global_skill_prefix == ".gemini/config/skills"
+
+
+def test_other_adapters_have_no_global_skill_prefix_override() -> None:
+    for agent in ("cursor", "claude-code", "codex"):
+        assert AGENT_ADAPTERS[agent].global_skill_prefix is None
 
 
 def test_validate_agent_names_rejects_unknown_agent() -> None:
@@ -73,6 +88,33 @@ def test_agent_bootstrap_actions_installs_all_codex_skills(repo: Path) -> None:
     paths = {action.path for action in actions}
     for skill_name in AGENT_SKILL_NAMES:
         assert repo / f".codex/skills/{skill_name}/SKILL.md" in paths
+
+
+def test_agent_bootstrap_actions_installs_all_agy_skills_locally(repo: Path) -> None:
+    actions = agent_bootstrap_actions(repo, ("agy",))
+
+    assert len(actions) == SKILLS_PER_AGENT
+    paths = {action.path for action in actions}
+    for skill_name in AGENT_SKILL_NAMES:
+        assert repo / f".agents/skills/{skill_name}/SKILL.md" in paths
+
+
+def test_agent_bootstrap_actions_installs_all_agy_skills_globally(repo: Path) -> None:
+    actions = agent_bootstrap_actions(repo, ("agy",), global_scope=True)
+
+    assert len(actions) == SKILLS_PER_AGENT
+    paths = {action.path for action in actions}
+    for skill_name in AGENT_SKILL_NAMES:
+        assert repo / f".gemini/config/skills/{skill_name}/SKILL.md" in paths
+
+
+def test_agent_bootstrap_actions_global_scope_does_not_affect_other_adapters(
+    repo: Path,
+) -> None:
+    local_actions = agent_bootstrap_actions(repo, ("codex",))
+    global_actions = agent_bootstrap_actions(repo, ("codex",), global_scope=True)
+
+    assert {action.path for action in local_actions} == {action.path for action in global_actions}
 
 
 def test_run_bootstrap_without_agents_does_not_install_skills(repo: Path) -> None:

@@ -74,6 +74,7 @@ Limit which agent adapters `init` installs:
 adrlane init --agent cursor
 adrlane init --agent cursor --agent claude-code
 adrlane init --agent codex
+adrlane init --agent agy
 ```
 
 `init` and `skills --local` always use the **current working directory** — there is no `--path` flag.
@@ -110,9 +111,9 @@ Preview: `adrlane upgrade --dry-run`. Details: [ADR 0005](docs/adr/0005-dedicate
 | --- | --- |
 | `adrlane init` | Bootstrap `docs/` and install agent skills in the current repository |
 | `adrlane init --dry-run` | Show planned bootstrap actions without writing files |
-| `adrlane init --agent <name>` | Limit adapters (`cursor`, `claude-code`, `codex`; repeatable) |
+| `adrlane init --agent <name>` | Limit adapters (`cursor`, `claude-code`, `codex`, `agy`; repeatable) |
 | `adrlane init --workspace` | Bootstrap with multi-repo doc routing config |
-| `adrlane skills install --global` | Install skills in `~/.cursor/skills/`, `~/.claude/skills/` and `~/.codex/skills/` |
+| `adrlane skills install --global` | Install skills in `~/.cursor/skills/`, `~/.claude/skills/`, `~/.codex/skills/` and `~/.gemini/config/skills/` |
 | `adrlane skills install --local` | Install skills in the current repository (skips existing files) |
 | `adrlane skills upgrade --global` | Overwrite global skills with the current package version |
 | `adrlane skills upgrade --local` | Overwrite local skills in the current repository |
@@ -157,7 +158,7 @@ Release history stays in Git and release tooling — not in `docs/`.
 
 ## Agent skills
 
-By default, `init` installs seven skills for Cursor and Claude Code:
+By default, `init` installs seven skills for every supported agent:
 
 | Skill | Role |
 | --- | --- |
@@ -169,11 +170,13 @@ By default, `init` installs seven skills for Cursor and Claude Code:
 | `adrlane-write-architecture-overview` | Create or refresh `docs/architecture.md`, the whole-system overview |
 | `adrlane-workspace-routing` | Route docs to project or sub-repo trees (when `.adrlane/workspace.yaml` exists) |
 
-**Project-local** (default via `init`): `.cursor/skills/`, `.claude/skills/` and `.codex/skills/` in the repository.
+**Project-local** (default via `init`): `.cursor/skills/`, `.claude/skills/`, `.codex/skills/` and `.agents/skills/` in the repository.
 
 **Global** (optional via `skills install --global`): same skills in your home directory, shared across all projects.
 
 Codex CLI scans both: `<repo>/.codex/skills` as a project-local skill root, and `$CODEX_HOME/skills` (default `~/.codex/skills`) as the user-level one. The same `.codex/skills` prefix therefore serves both scopes.
+
+Antigravity CLI (`agy`) scans `<workspace>/.agents/skills` as its project-local skill root, but a different, unrelated global root: `~/.gemini/config/skills`. Its adapter installs into `.agents/skills` for `--local` and `.gemini/config/skills` for `--global` — see [ADR 0009](docs/adr/0009-agy-adapter-uses-a-distinct-global-skill-prefix.md).
 
 Skills are thin adapters; the canonical contract lives in `docs/llm/AGENT_PROTOCOL.md` and `docs/llm/DECISION_RULES.md`.
 

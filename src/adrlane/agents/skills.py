@@ -37,12 +37,14 @@ def run_skills(
     *,
     upgrade: bool = False,
     dry_run: bool = False,
+    scope: SkillsScope = SkillsScope.LOCAL,
 ) -> SkillsResult:
     created: list[Path] = []
     skipped: list[Path] = []
     updated: list[Path] = []
 
-    for action in agent_bootstrap_actions(target, agents):
+    global_scope = scope is SkillsScope.GLOBAL
+    for action in agent_bootstrap_actions(target, agents, global_scope=global_scope):
         if action.path.exists():
             if upgrade:
                 if not dry_run:

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-SUPPORTED_AGENTS = ("cursor", "claude-code", "codex")
+SUPPORTED_AGENTS = ("cursor", "claude-code", "codex", "agy")
 DEFAULT_AGENTS = SUPPORTED_AGENTS
 
 SUPPORTED_AGENTS_HELP = ", ".join(SUPPORTED_AGENTS)
@@ -12,6 +12,16 @@ SUPPORTED_AGENTS_HELP = ", ".join(SUPPORTED_AGENTS)
 class AgentAdapter:
     name: str
     skill_prefix: str
+    # Only set when an agent's global (--global) skill root is not simply
+    # `skill_prefix` under the home directory. See ADR 0009.
+    global_skill_prefix: str | None = None
+
+
+def skill_prefix_for(adapter: AgentAdapter, *, global_scope: bool = False) -> str:
+    """Return the install-relative skill prefix for an adapter and scope."""
+    if global_scope and adapter.global_skill_prefix is not None:
+        return adapter.global_skill_prefix
+    return adapter.skill_prefix
 
 
 AGENT_ADAPTERS: dict[str, AgentAdapter] = {
@@ -21,6 +31,14 @@ AGENT_ADAPTERS: dict[str, AgentAdapter] = {
     # `$CODEX_HOME/skills` (default `~/.codex/skills`) as the user-level one, so the
     # same prefix serves both the --local and --global scopes.
     "codex": AgentAdapter(name="codex", skill_prefix=".codex/skills"),
+    # Antigravity CLI (agy) scans `<workspace>/.agents/skills` as its repo-local
+    # skill root, but a *different*, unrelated global root: `~/.gemini/config/skills`.
+    # Unlike codex, one relative prefix cannot serve both scopes. See ADR 0009.
+    "agy": AgentAdapter(
+        name="agy",
+        skill_prefix=".agents/skills",
+        global_skill_prefix=".gemini/config/skills",
+    ),
 }
 
 
