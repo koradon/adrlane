@@ -85,7 +85,7 @@ def skills_install_command(
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
 
-    result = run_skills(target, agents, upgrade=False, dry_run=False)
+    result = run_skills(target, agents, upgrade=False, dry_run=False, scope=scope)
     _echo_skills_result(result, dry_run=False, action="install")
 
 
@@ -127,5 +127,5 @@ def skills_upgrade_command(
     except ValueError as exc:
         raise typer.BadParameter(str(exc)) from exc
 
-    result = run_skills(target, agents, upgrade=True, dry_run=dry_run)
+    result = run_skills(target, agents, upgrade=True, dry_run=dry_run, scope=scope)
     _echo_skills_result(result, dry_run=dry_run, action="upgrade")

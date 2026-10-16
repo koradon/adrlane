@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from agent_expectations import agent_skill_path, agent_skill_paths
+from agent_expectations import agent_skill_path, agent_skill_paths, global_agent_skill_path
 from helpers import invoke_cli, plain_output
 
 from adrlane.bootstrap import run_bootstrap
@@ -51,6 +51,30 @@ def test_skills_install_global_writes_to_home(runner, tmp_path: Path, monkeypatc
 
     assert result.exit_code == 0
     assert (tmp_path / agent_skill_path("cursor", "adrlane-dev-context")).is_file()
+
+
+# agy's global scope resolves to `~/.gemini/config/skills`, not `~/.agents/skills`
+# (ADR 0009) — unlike codex, whose single skill_prefix already works for both scopes.
+def test_skills_install_global_agy_writes_to_gemini_config(
+    runner, tmp_path: Path, monkeypatch
+) -> None:
+    monkeypatch.setattr(Path, "home", lambda: tmp_path)
+
+    result = invoke_cli(runner, ["skills", "install", "--global", "--agent", "agy"])
+
+    assert result.exit_code == 0
+    assert (tmp_path / global_agent_skill_path("agy", "adrlane-dev-context")).is_file()
+    assert not (tmp_path / ".agents").exists()
+
+
+def test_skills_install_local_agy_writes_to_dot_agents(runner, repo: Path, monkeypatch) -> None:
+    monkeypatch.chdir(repo)
+    (repo / ".adrlane").mkdir()
+
+    result = invoke_cli(runner, ["skills", "install", "--local", "--agent", "agy"])
+
+    assert result.exit_code == 0
+    assert (repo / ".agents" / "skills" / "adrlane-dev-context" / "SKILL.md").is_file()
 
 
 def test_skills_upgrade_local_overwrites_existing_skill(runner, repo: Path, monkeypatch) -> None:

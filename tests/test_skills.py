@@ -104,6 +104,30 @@ def test_run_skills_install_writes_global_codex_skills_under_dot_codex(tmp_path:
     assert (tmp_path / ".codex" / "skills" / "adrlane-dev-context" / "SKILL.md").is_file()
 
 
+# A local agy install uses `.agents/skills`, the workspace root Antigravity scans.
+def test_run_skills_install_writes_local_agy_skills_under_dot_agents(repo: Path) -> None:
+    run_bootstrap(repo)
+
+    result = run_skills(repo, ("agy",), upgrade=False, scope=SkillsScope.LOCAL)
+
+    assert len(result.created) == SKILLS_PER_AGENT
+    assert (repo / ".agents" / "skills" / "adrlane-dev-context" / "SKILL.md").is_file()
+
+
+# Unlike codex, a global agy install resolves to a *different* root,
+# `~/.gemini/config/skills`, not `~/.agents/skills` (ADR 0009).
+def test_run_skills_install_writes_global_agy_skills_under_gemini_config(
+    tmp_path: Path,
+) -> None:
+    result = run_skills(tmp_path, ("agy",), upgrade=False, scope=SkillsScope.GLOBAL)
+
+    assert len(result.created) == SKILLS_PER_AGENT
+    assert (
+        tmp_path / ".gemini" / "config" / "skills" / "adrlane-dev-context" / "SKILL.md"
+    ).is_file()
+    assert not (tmp_path / ".agents").exists()
+
+
 def test_run_skills_upgrade_dry_run_does_not_write(repo: Path) -> None:
     run_bootstrap(repo, agents=("cursor",))
     skill_path = repo / agent_skill_path("cursor", "adrlane-dev-context")

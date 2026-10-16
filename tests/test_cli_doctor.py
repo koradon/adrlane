@@ -86,6 +86,20 @@ def test_doctor_flags_missing_agent_skill(runner, repo: Path, monkeypatch) -> No
     assert "Missing" in output
 
 
+def test_doctor_flags_outdated_agy_skill(runner, repo: Path, monkeypatch) -> None:
+    monkeypatch.chdir(repo)
+    run_bootstrap(repo, agents=("agy",))
+    skill_path = repo / agent_skill_path("agy", "adrlane-write-spec")
+    skill_path.write_text("stale\n", encoding="utf-8")
+
+    result = invoke_cli(runner, ["doctor"])
+    output = plain_output(result)
+
+    assert result.exit_code == 0
+    assert agent_skill_path("agy", "adrlane-write-spec") in output
+    assert "Outdated" in output
+
+
 def test_doctor_does_not_flag_uninstalled_agent(runner, repo: Path, monkeypatch) -> None:
     monkeypatch.chdir(repo)
     run_bootstrap(repo, agents=("cursor",))

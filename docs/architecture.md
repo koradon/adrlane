@@ -51,8 +51,8 @@ Every command follows the same shape: **plan, then apply.**
 | `bootstrap/actions.py` | `BootstrapAction` — the plan's unit of work: a path, a kind (`dir`/`file`), and file content. |
 | `bootstrap/executor.py` | `run_bootstrap()` — applies a plan to disk. Skips existing files/dirs; honors `dry_run`. |
 | `bootstrap/templates_loader.py` | Reads packaged `docs/` template files bundled in the wheel; separates "seed files" (user-owned, `init` only) from "framework files" under `docs/llm/*` (package-owned, `upgrade` overwrites them). |
-| `bootstrap/agents_loader.py` | Reads packaged skill files and maps each one to the right target path per agent (`.cursor/skills/<name>/SKILL.md`, `.claude/skills/<name>/SKILL.md`, `.codex/skills/<name>/SKILL.md`). It picks up every subfolder under `templates/agents/skills/` automatically — adding a new skill needs no code change here. |
-| `agents/registry.py` | `SUPPORTED_AGENTS` (`cursor`, `claude-code`, `codex`) and validation/normalization of `--agent` selections. |
+| `bootstrap/agents_loader.py` | Reads packaged skill files and maps each one to the right target path per agent and scope (`.cursor/skills/<name>/SKILL.md`, `.claude/skills/<name>/SKILL.md`, `.codex/skills/<name>/SKILL.md`, `.agents/skills/<name>/SKILL.md` or `.gemini/config/skills/<name>/SKILL.md` for `agy`). It picks up every subfolder under `templates/agents/skills/` automatically — adding a new skill needs no code change here. |
+| `agents/registry.py` | `SUPPORTED_AGENTS` (`cursor`, `claude-code`, `codex`, `agy`) and validation/normalization of `--agent` selections. `skill_prefix_for()` resolves an adapter's local vs. global skill prefix. |
 | `agents/skills.py` | `run_skills()` — install or upgrade skill files for a given scope (repo-local or user-home/global); `is_adrlane_repository()` — detects whether a folder is already bootstrapped. |
 | `upgrade.py` | `run_upgrade()` — overwrites package-owned content (`docs/llm/*`, `.adrlane/bootstrap-version`, agent skills) after the installed `adrlane` package changes version. Never touches user-owned docs. |
 | `doctor.py` | `run_doctor()` — read-only comparison between on-disk files and what the current package version would produce. Reports drift; never writes files; never fails (always exits `0`). |
@@ -71,7 +71,7 @@ The dependency direction is one-way: `cli/*` depends on `bootstrap/*`, `agents/*
 | `docs/architecture.md` | user (created by a skill) | Whole-system overview, created/refreshed on request by the `adrlane-write-architecture-overview` skill — `adrlane` itself never writes it. |
 | `docs/llm/*` | package | Agent contract and templates. Overwritten by `upgrade` to stay in sync with the installed package version. |
 | `docs/README.md`, `docs/ideas/README.md`, `docs/roadmap/README.md` | user (seeded once) | Created by `init` if missing, then owned by the user/agent. `upgrade` never overwrites them. |
-| `.cursor/skills/<name>/SKILL.md`, `.claude/skills/<name>/SKILL.md`, `.codex/skills/<name>/SKILL.md` | package | One file per installed skill per agent adapter. `install` skips existing files; `upgrade` overwrites them. |
+| `.cursor/skills/<name>/SKILL.md`, `.claude/skills/<name>/SKILL.md`, `.codex/skills/<name>/SKILL.md`, `.agents/skills/<name>/SKILL.md` | package | One file per installed skill per agent adapter. `install` skips existing files; `upgrade` overwrites them. |
 
 ## Modes / entry points
 
@@ -79,7 +79,7 @@ The dependency direction is one-way: `cli/*` depends on `bootstrap/*`, `agents/*
 | --- | --- | --- |
 | `adrlane init` | Creates `.adrlane/`, `docs/` folders, doc templates, and agent skills (unless already present). | Yes — never overwrites existing files. |
 | `adrlane init --dry-run` | Prints the plan only; writes nothing. | N/A (read-only) |
-| `adrlane init --agent <name>` (repeatable) | Limits which agent adapters (`cursor`, `claude-code`, `codex`) get skill files. Defaults to all supported agents. | Yes |
+| `adrlane init --agent <name>` (repeatable) | Limits which agent adapters (`cursor`, `claude-code`, `codex`, `agy`) get skill files. Defaults to all supported agents. | Yes |
 | `adrlane init --workspace` | Also creates `.adrlane/workspace.yaml` for multi-repo doc routing. | Yes |
 | `adrlane upgrade` | Overwrites `docs/llm/*`, `.adrlane/bootstrap-version`, and local agent skills to match the installed package version. Requires an existing `.adrlane/` bootstrap. | Yes to re-run, but each run **overwrites** package-owned files (not additive like `init`). |
 | `adrlane upgrade --dry-run` / `--agent <name>` | Same options as `init`, applied to `upgrade`. | — |
@@ -87,7 +87,7 @@ The dependency direction is one-way: `cli/*` depends on `bootstrap/*`, `agents/*
 | `adrlane skills upgrade --local\|--global` | Same as above but overwrites existing skill files. Supports `--dry-run`. | Overwrites |
 | `adrlane doctor` | Compares on-disk files against what the current package version expects. Read-only, informational, always exits `0`. | Yes (no side effects) |
 
-**Local vs. global skill scope:** local skills live inside the repository (`.cursor/skills/`, `.claude/skills/`, `.codex/skills/`) and are shared with everyone who clones it; global skills live in the user's home directory and apply across every project on that machine. See ADR 0003. Codex scans both a repo-local `.codex/skills` and `$CODEX_HOME/skills` (default `~/.codex/skills`), so the one prefix covers both scopes — see ADR 0008.
+**Local vs. global skill scope:** local skills live inside the repository (`.cursor/skills/`, `.claude/skills/`, `.codex/skills/`, `.agents/skills/`) and are shared with everyone who clones it; global skills live in the user's home directory and apply across every project on that machine. See ADR 0003. Codex scans both a repo-local `.codex/skills` and `$CODEX_HOME/skills` (default `~/.codex/skills`), so the one prefix covers both scopes — see ADR 0008. Antigravity (`agy`) scans a repo-local `.agents/skills` but an unrelated global root, `~/.gemini/config/skills`, so its adapter declares a separate `global_skill_prefix` — see ADR 0009.
 
 **Multi-repo workspace mode:** when the AI agent's workspace root is not itself a single git repository (e.g. a folder containing several repos plus shared docs), running `adrlane init --workspace` at that root creates `.adrlane/workspace.yaml`. The `adrlane-workspace-routing` skill then reads that file to decide whether a new doc belongs in the project-level `docs/` or in a specific repository's `<repo>/docs/`. Each sub-repository still needs its own `adrlane init` for its service-level docs.
 
@@ -144,3 +144,5 @@ flowchart TD
 - ADR: `docs/adr/0003-global-and-local-skills-install-scope.md`
 - ADR: `docs/adr/0004-doc-filename-and-lifecycle-conventions.md`
 - ADR: `docs/adr/0005-dedicated-upgrade-command-for-package-owned-content.md`
+- ADR: `docs/adr/0008-codex-adapter-installs-into-repo-local-dot-codex-skills.md`
+- ADR: `docs/adr/0009-agy-adapter-uses-a-distinct-global-skill-prefix.md`
