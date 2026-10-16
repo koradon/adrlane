@@ -4,9 +4,9 @@ labels:
 - agents
 assignees:
 - koradon
-state: open
+state: closed
 number: 45
-state_reason: null
+state_reason: completed
 ---
 
 ## Goal
