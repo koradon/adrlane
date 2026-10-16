@@ -100,6 +100,20 @@ def test_doctor_flags_outdated_agy_skill(runner, repo: Path, monkeypatch) -> Non
     assert "Outdated" in output
 
 
+def test_doctor_ignores_generic_agents_skills_dir_without_adrlane_skills(
+    runner, repo: Path, monkeypatch
+) -> None:
+    monkeypatch.chdir(repo)
+    (repo / ".agents" / "skills" / "other-tool-skill").mkdir(parents=True)
+
+    result = invoke_cli(runner, ["doctor"])
+    output = plain_output(result)
+
+    assert result.exit_code == 0
+    assert "Missing" not in output
+    assert ".agents/skills" not in output
+
+
 def test_doctor_does_not_flag_uninstalled_agent(runner, repo: Path, monkeypatch) -> None:
     monkeypatch.chdir(repo)
     run_bootstrap(repo, agents=("cursor",))

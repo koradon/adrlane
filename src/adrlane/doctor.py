@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from adrlane import __version__
-from adrlane.agents.registry import AGENT_ADAPTERS, SUPPORTED_AGENTS
+from adrlane.agents.registry import SUPPORTED_AGENTS
 from adrlane.agents.skills import is_adrlane_repository
 from adrlane.bootstrap.agents_loader import agent_bootstrap_actions
 from adrlane.bootstrap.templates_loader import template_bootstrap_actions
@@ -117,12 +117,12 @@ def _agent_adapter_checks(root: Path) -> list[DoctorCheck]:
     any_installed = False
 
     for agent_name in SUPPORTED_AGENTS:
-        adapter = AGENT_ADAPTERS[agent_name]
-        if not (root / adapter.skill_prefix).is_dir():
+        actions = agent_bootstrap_actions(root, (agent_name,))
+        if not any(action.path.is_file() for action in actions):
             continue
         any_installed = True
 
-        for action in agent_bootstrap_actions(root, (agent_name,)):
+        for action in actions:
             relative = action.path.relative_to(root)
             if not action.path.is_file():
                 checks.append(
